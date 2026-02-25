@@ -3087,10 +3087,29 @@ function applyStyleToSelection() {
 }
 
 
+  function getScrollableAncestor(el) {
+    let node = el?.parentElement;
+    while (node && node !== root) {
+      const style = window.getComputedStyle(node);
+      const canScrollY = /(auto|scroll)/.test(style.overflowY || '');
+      if (canScrollY && node.scrollHeight > node.clientHeight) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
   function jumpTo(selector) {
     const el = root.querySelector(selector);
     if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Keep quick-tool jumps scoped to an inner scroller only.
+    // Never call element.scrollIntoView() here, because that can move the whole page
+    // and push the board / quick tools out of the viewport on mobile.
+    const scroller = getScrollableAncestor(el);
+    if (!scroller) return;
+
+    const top = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 12;
+    scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
   }
 
   // Drawer header clicks: use openDrawer (single source of truth)
