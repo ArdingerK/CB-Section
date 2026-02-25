@@ -4321,6 +4321,21 @@ function rotateSelected(direction) {
   if (root.__pc_sd_actions_bound) return;
   root.__pc_sd_actions_bound = true;
 
+  function setQuicktoolsCollapsedState(quicktools, isCollapsed) {
+    if (!quicktools) return;
+
+    quicktools.classList.toggle('is-collapsed', isCollapsed);
+    quicktools.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+
+    const stack = quicktools.querySelector('.pc-sd__qt-stack');
+    const closeBtn = quicktools.querySelector('[data-qt-collapse]');
+    const expandBtn = quicktools.querySelector('[data-qt-expand]');
+
+    if (stack) stack.hidden = isCollapsed;
+    if (closeBtn) closeBtn.hidden = isCollapsed;
+    if (expandBtn) expandBtn.hidden = !isCollapsed;
+  }
+
   root.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-qt], [data-action], [data-rotate-left], [data-rotate-right], [data-delete-selected], [data-clear-board], [data-qt-collapse], [data-qt-expand]');
     if (!btn || !root.contains(btn)) return;
@@ -4342,20 +4357,12 @@ function rotateSelected(direction) {
 
 
     if (btn.matches('[data-qt-collapse]')) {
-      const quicktools = btn.closest('.pc-sd__quicktools--desktop');
-      if (quicktools) {
-        quicktools.classList.add('is-collapsed');
-        quicktools.setAttribute('aria-expanded', 'false');
-      }
+      setQuicktoolsCollapsedState(btn.closest('.pc-sd__quicktools--desktop'), true);
       return;
     }
 
     if (btn.matches('[data-qt-expand]')) {
-      const quicktools = btn.closest('.pc-sd__quicktools--desktop');
-      if (quicktools) {
-        quicktools.classList.remove('is-collapsed');
-        quicktools.setAttribute('aria-expanded', 'true');
-      }
+      setQuicktoolsCollapsedState(btn.closest('.pc-sd__quicktools--desktop'), false);
       return;
     }
     if (btn.matches('[data-clear-board]')) {
