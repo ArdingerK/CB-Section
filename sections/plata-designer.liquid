@@ -343,7 +343,7 @@
       <div class="pc-sd__quicktools pc-sd__quicktools--desktop" aria-label="Quick tools">
         <button type="button" class="pc-sd__qt-close" data-qt-collapse aria-label="Close quick tools">×</button>
 
-        <div class="pc-sd__qt-row" role="toolbar" aria-label="Quick tools">
+        <div class="pc-sd__qt-stack" role="toolbar" aria-label="Quick tools">
           <button type="button" class="pc-sd__qt-btn" data-action="rotate-left" aria-label="Rotate left">⟲</button>
           <button type="button" class="pc-sd__qt-btn" data-action="rotate-right" aria-label="Rotate right">⟳</button>
           <button type="button" class="pc-sd__qt-btn" data-action="delete" aria-label="Delete">🗑</button>
@@ -1374,6 +1374,13 @@ width: var(--boardWpx);
   justify-content: center;
   font-size: 24px;
   line-height: 1;
+}
+
+.pc-sd__qt-stack{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
   /* Step 4 pinned under canvas (bottom of rightcol) */
@@ -2607,12 +2614,11 @@ font-weight: bold;
   z-index: 40 !important;
 }
 
-.pc-sd__qt-row{
+.pc-sd__qt-stack{
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* Make tile positionable */
@@ -2727,37 +2733,42 @@ font-weight: bold;
     top: 16px;
     right: 16px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 12px 16px;
-    border-radius: 20px;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 8px 10px;
+    border-radius: 14px;
     background: #fff;
   }
 
-  .pc-sd__qt-row{
+  .pc-sd__qt-stack{
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .pc-sd__qt-close{
-    position: absolute;
-    top: 6px;
-    right: 8px;
+    position: relative;
+    top: auto;
+    right: auto;
     font-weight: 900;
     line-height: 1;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border: 0;
     border-radius: 4px;
     background: transparent;
     color: #111;
     font-size: 14px;
     cursor: pointer;
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     padding: 0;
+    margin: 0;
   }
 
   .pc-sd__qt-tab{
@@ -2776,7 +2787,7 @@ font-weight: bold;
   }
 
   .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-tab{ display: flex; }
-  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-row,
+  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-stack,
   .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-close{ display: none; }
 }
 </style>
@@ -2817,8 +2828,8 @@ font-weight: bold;
       const closeButtons = Array.from(activeDesktop.querySelectorAll('.pc-sd__qt-close'));
       closeButtons.forEach((btn, idx) => { if (idx > 0) btn.remove(); });
 
-      const rows = Array.from(activeDesktop.querySelectorAll('.pc-sd__qt-row'));
-      rows.forEach((row, idx) => { if (idx > 0) row.remove(); });
+      const stacks = Array.from(activeDesktop.querySelectorAll('.pc-sd__qt-stack, .pc-sd__qt-row'));
+      stacks.forEach((stack, idx) => { if (idx > 0) stack.remove(); });
 
       const tabs = Array.from(activeDesktop.querySelectorAll('.pc-sd__qt-tab'));
       tabs.forEach((tab, idx) => { if (idx > 0) tab.remove(); });
