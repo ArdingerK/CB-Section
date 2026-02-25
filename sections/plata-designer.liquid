@@ -868,7 +868,7 @@
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 .pc-sd__canvas-container,
 .pc-sd__canvas-scroll-area{
@@ -895,13 +895,20 @@ width: var(--boardWpx);
 }
 .pc-sd__board-img-el{
   position:absolute;
-  inset:0;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
   width:100%;
   height:100%;
   object-fit:fill;
   pointer-events:none;
   display:block;
   z-index:1;
+}
+.pc-sd__canvas.is-flipped .pc-sd__board-img-el{
+  width:var(--boardHpx);
+  height:var(--boardWpx);
+  transform:translate(-50%,-50%) rotate(90deg);
 }
 .pc-sd__stage{ position:absolute; inset:0; z-index:5; }
 
@@ -1935,7 +1942,7 @@ margin-bottom: 6px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding-bottom: 140px;
 }
 
@@ -3244,10 +3251,10 @@ if (!stage || typeof stage.addEventListener !== 'function') {
 }
 
 const boardConfigs = {
-  porch:  { wIn: 7.5, hIn: 58,  dW: 160,  bg: root.dataset.bgPorch  || "", associatedPrefix: "porch" },
-  oval:   { wIn: 11,  hIn: 14,  dW: 280,  bg: root.dataset.bgOval   || "", associatedPrefix: "oval" },
-  wreath: { wIn: 15,  hIn: 5,   dW: 400,  bg: root.dataset.bgWreath || "", associatedPrefix: "wreath" },
-  framed: { wIn: 12,  hIn: 17,  dW: 300,  bg: root.dataset.bgFramedPine || root.dataset.bgFramedWhite || root.dataset.bgFramed || "", associatedPrefix: "framed" }
+  porch:  { wIn: 7.5, hIn: 58,  dW: 160,  bg: root.dataset.bgPorch  || "", associatedPrefix: "porch",  defaultOrientation: 'vertical' },
+  oval:   { wIn: 11,  hIn: 14,  dW: 280,  bg: root.dataset.bgOval   || "", associatedPrefix: "oval",   defaultOrientation: 'vertical' },
+  wreath: { wIn: 15,  hIn: 5,   dW: 400,  bg: root.dataset.bgWreath || "", associatedPrefix: "wreath", defaultOrientation: 'horizontal' },
+  framed: { wIn: 12,  hIn: 17,  dW: 300,  bg: root.dataset.bgFramedPine || root.dataset.bgFramedWhite || root.dataset.bgFramed || "", associatedPrefix: "framed", defaultOrientation: 'vertical' }
 };
 
 
@@ -4019,9 +4026,11 @@ const rect = stageEl.getBoundingClientRect();
     const boardVal = root.querySelector('.pc-sd__board-select')?.value || 'porch';
     const cfg = boardConfigs[boardVal] || boardConfigs.porch;
 
-    const isH = canvas.dataset.orientation === 'horizontal';
-    const bW = isH ? cfg.hIn : cfg.wIn;
-    const bH = isH ? cfg.wIn : cfg.hIn;
+    const flipped = canvas.dataset.flipped === 'true';
+    const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
+    const isH = flipped ? !defaultIsH : defaultIsH;
+    const bW = isH ? Math.max(cfg.wIn, cfg.hIn) : Math.min(cfg.wIn, cfg.hIn);
+    const bH = isH ? Math.min(cfg.wIn, cfg.hIn) : Math.max(cfg.wIn, cfg.hIn);
 
     const sW = parseFloat(el.dataset.w) * 0.9;
     el.style.setProperty('--calc-width', (sW / bW * 100) + '%');
@@ -4048,7 +4057,10 @@ function updateBoard() {
   const cfg = boardConfigs[val];
   if (!cfg) return;
 
-  const isH = canvas.dataset.orientation === 'horizontal';
+  const flipped = canvas.dataset.flipped === 'true';
+  const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
+  const isH = flipped ? !defaultIsH : defaultIsH;
+  canvas.dataset.orientation = isH ? 'horizontal' : 'vertical';
 
   const base = Number(cfg.dW);
   const wIn  = Number(cfg.wIn);
@@ -4056,19 +4068,22 @@ function updateBoard() {
 
   if (!base || !wIn || !hIn) return;
 
-  // Calculate board in its natural orientation first
+  // Calculate board in its natural orientation from width/height ratio
   const naturalW = base;
   const naturalH = base * (hIn / wIn);
+  const naturalIsH = wIn >= hIn;
 
-  // Flip by swapping dimensions
-  const w = isH ? naturalH : naturalW;
-  const h = isH ? naturalW : naturalH;
+  // Flip by swapping dimensions only when target orientation differs from natural
+  const shouldSwap = isH !== naturalIsH;
+  const w = shouldSwap ? naturalH : naturalW;
+  const h = shouldSwap ? naturalW : naturalH;
 
   // Set canvas size ONLY
   const canvasEl = root.querySelector('.pc-sd__canvas');
   if (canvasEl) {
     canvasEl.style.setProperty('--boardWpx', `${w}px`);
     canvasEl.style.setProperty('--boardHpx', `${h}px`);
+    canvasEl.classList.toggle('is-flipped', flipped);
   }
 
   // Background image
@@ -4900,6 +4915,7 @@ const boardSel =
 if (boardSel) {
   boardSel.addEventListener('change', () => {
     userSetZoom = false;   // ✅ allow auto-fit again
+    canvas.dataset.flipped = 'false';
     updateBoard();
   });
 } else {
@@ -4935,6 +4951,8 @@ packSelectEls.forEach(sel => {
   });
 });
 
+canvas.dataset.flipped = canvas.dataset.flipped || 'false';
+
 const flipBtn = root.querySelector('[data-orientation-toggle]');
 
 flipBtn.addEventListener('click', () => {
@@ -4944,11 +4962,8 @@ flipBtn.addEventListener('click', () => {
   const currentZoom =
     parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
 
-  // Toggle orientation
-  canvas.dataset.orientation =
-    (canvas.dataset.orientation === 'horizontal')
-      ? 'vertical'
-      : 'horizontal';
+  // Toggle orientation relative to each board's default orientation
+  canvas.dataset.flipped = (canvas.dataset.flipped === 'true') ? 'false' : 'true';
 
   // TEMP disable auto-fit
   const prevUserSetZoom = userSetZoom;
