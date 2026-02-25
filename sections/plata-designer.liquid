@@ -2734,12 +2734,15 @@ font-weight: bold;
     right: 16px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 8px;
-    padding: 8px 8px 10px;
+    padding: 10px 12px 10px;
     border-radius: 14px;
     background: #fff;
+    box-sizing: border-box;
+    min-width: 56px;
+    position: relative;
   }
 
   .pc-sd__qt-stack{
@@ -2747,21 +2750,22 @@ font-weight: bold;
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    padding-top: 16px;
   }
 
   .pc-sd__qt-close{
-    position: relative;
-    top: auto;
-    right: auto;
+    position: absolute;
+    top: 6px;
+    right: 8px;
     font-weight: 900;
     line-height: 1;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 0;
     border-radius: 4px;
     background: transparent;
     color: #111;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -2782,13 +2786,25 @@ font-weight: bold;
     line-height: 1;
     cursor: pointer;
     display: none;
+    visibility: hidden;
+    pointer-events: none;
     align-items: center;
     justify-content: center;
   }
 
-  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-tab{ display: flex; }
+  .pc-sd__quicktools--desktop:not(.is-collapsed) .pc-sd__qt-tab{
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-tab{
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
   .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-stack,
-  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-close{ display: none; }
+  .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-close{ display: none !important; }
 }
 </style>
 
@@ -4312,6 +4328,7 @@ function rotateSelected(direction) {
       const quicktools = btn.closest('.pc-sd__quicktools--desktop');
       if (quicktools && window.matchMedia('(min-width: 990px)').matches) {
         quicktools.classList.add('is-collapsed');
+        quicktools.setAttribute('aria-expanded', 'false');
       }
       return;
     }
@@ -4320,6 +4337,7 @@ function rotateSelected(direction) {
       const quicktools = btn.closest('.pc-sd__quicktools--desktop');
       if (quicktools) {
         quicktools.classList.remove('is-collapsed');
+        quicktools.setAttribute('aria-expanded', 'true');
       }
       return;
     }
