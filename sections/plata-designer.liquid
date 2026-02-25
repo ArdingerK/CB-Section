@@ -914,8 +914,8 @@ width: var(--boardWpx);
   transform-origin:center center;
 }
 .pc-sd__canvas.is-wreath-rotated .pc-sd__board-img-el{
-  width:100%;
-  height:100%;
+  width:var(--boardHpx);
+  height:var(--boardWpx);
   transform-origin:center center;
   transform:translate(-50%,-50%) rotate(90deg);
 }
@@ -4039,8 +4039,12 @@ const rect = stageEl.getBoundingClientRect();
     const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
     const isWreath = boardVal === 'wreath';
     const isH = isWreath ? defaultIsH : (flipped ? !defaultIsH : defaultIsH);
-    const bW = isH ? Math.max(cfg.wIn, cfg.hIn) : Math.min(cfg.wIn, cfg.hIn);
-    const bH = isH ? Math.min(cfg.wIn, cfg.hIn) : Math.max(cfg.wIn, cfg.hIn);
+    const naturalWIn = Number(cfg.wIn);
+    const naturalHIn = Number(cfg.hIn);
+    const naturalIsH = naturalWIn >= naturalHIn;
+    const shouldSwap = isH !== naturalIsH;
+    const bW = shouldSwap ? naturalHIn : naturalWIn;
+    const bH = shouldSwap ? naturalWIn : naturalHIn;
 
     const sW = parseFloat(el.dataset.w) * 0.9;
     el.style.setProperty('--calc-width', (sW / bW * 100) + '%');
@@ -4079,26 +4083,15 @@ function updateBoard() {
 
   if (!base || !wIn || !hIn) return;
 
-  let w;
-  let h;
+  // Calculate board in its natural orientation from width/height ratio.
+  const naturalW = base;
+  const naturalH = base * (hIn / wIn);
+  const naturalIsH = wIn >= hIn;
 
-  if (isWreath) {
-    // Wreath keeps fixed board dimensions; flip only rotates the image.
-    const naturalW = base;
-    const naturalH = base * (hIn / wIn);
-    w = naturalW;
-    h = naturalH;
-  } else {
-    // Calculate board in its natural orientation from width/height ratio.
-    const naturalW = base;
-    const naturalH = base * (hIn / wIn);
-    const naturalIsH = wIn >= hIn;
-
-    // Flip by swapping dimensions only when target orientation differs from natural.
-    const shouldSwap = isH !== naturalIsH;
-    w = shouldSwap ? naturalH : naturalW;
-    h = shouldSwap ? naturalW : naturalH;
-  }
+  // Flip by swapping dimensions only when target orientation differs from natural.
+  const shouldSwap = isH !== naturalIsH;
+  const w = shouldSwap ? naturalH : naturalW;
+  const h = shouldSwap ? naturalW : naturalH;
 
   // Set canvas size ONLY
   const canvasEl = root.querySelector('.pc-sd__canvas');
