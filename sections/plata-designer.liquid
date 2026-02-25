@@ -3609,7 +3609,7 @@ window.PCSD.state = () => ({
 
   // Keep extra breathing room only for the initial porch-board fit.
   if (initialPorchFit) {
-    const PORCH_INITIAL_MARGIN_FACTOR = 0.78;
+    const PORCH_INITIAL_MARGIN_FACTOR = 1.0;
     availW *= PORCH_INITIAL_MARGIN_FACTOR;
     availH *= PORCH_INITIAL_MARGIN_FACTOR;
   }
@@ -3623,7 +3623,7 @@ window.PCSD.state = () => ({
 
   // Keep porch board smaller on first paint so it stays clear of the bottom bar.
   if (initialPorchFit) {
-    clamped = Math.max(0.25, Math.min(clamped, 0.58));
+    clamped = Math.max(0.25, Math.min(clamped, 0.7));
   }
 
   if (!userSetZoom) {
