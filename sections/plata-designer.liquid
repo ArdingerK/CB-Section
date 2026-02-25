@@ -2889,51 +2889,44 @@ if (saveBtn) {
   setDrawerState(d, true);
 };
 }
-function pcSdInnerStrokeSvg(svg, color, innerPx) {
-  if (!svg) return;
-
-  // remove previous inner-stroke overlays
-  svg.querySelectorAll('[data-pc-sd-innerstroke="1"]').forEach(n => n.remove());
-
-  // defs
-  let defs = svg.querySelector('defs');
-  if (!defs) {
-    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    svg.insertBefore(defs, svg.firstChild);
-  }
-
-  
-
-  const uid = `pcsd_${Math.random().toString(36).slice(2)}_`;
-
-  drawables.forEach((node, i) => {
-    // clip path from the original shape
-    const cp = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-    const clipId = uid + i;
-    cp.setAttribute('id', clipId);
-
-    const clipClone = node.cloneNode(true);
-    clipClone.removeAttribute('stroke');
-    clipClone.removeAttribute('stroke-width');
-    cp.appendChild(clipClone);
-    defs.appendChild(cp);
-
-    // stroke overlay: width*2 + clip => visible part is inside only
-    const s = node.cloneNode(true);
-    s.setAttribute('fill', 'none');
-    s.setAttribute('stroke', color);
-    s.setAttribute('stroke-width', String(innerPx * 2));
-    s.setAttribute('stroke-linejoin', 'round');
-    s.setAttribute('stroke-linecap', 'round');
-    s.setAttribute('clip-path', `url(#${clipId})`);
-    s.setAttribute('data-pc-sd-innerstroke', '1');
-    s.style.pointerEvents = 'none';
-
-    node.insertAdjacentElement('afterend', s);
+ function getSvgOutlineTargets(svg) {
+  if (!svg) return [];
+  const drawableSelector = 'path,rect,circle,ellipse,line,polyline,polygon';
+  return Array.from(svg.querySelectorAll(drawableSelector)).filter((n) => {
+    if (!n.tagName) return false;
+    const hiddenByDefs = n.closest('defs,clipPath,mask,pattern,marker,symbol');
+    return !hiddenByDefs;
   });
 }
 
- function applyStyleToSelection() {
+function applySvgFillAndOutline(svg, fillColor) {
+  const nodes = getSvgOutlineTargets(svg);
+  if (!nodes.length) return;
+
+  nodes.forEach((n) => {
+    n.style.setProperty('fill', fillColor, 'important');
+
+    if (outlineOn) {
+      n.style.setProperty('stroke', outlineColor, 'important');
+      n.style.setProperty('stroke-width', String(outlineWidth), 'important');
+      n.style.setProperty('vector-effect', 'non-scaling-stroke', 'important');
+      n.style.setProperty('stroke-alignment', 'inner', 'important');
+      n.style.setProperty('paint-order', 'fill stroke', 'important');
+      n.style.setProperty('stroke-linejoin', 'round', 'important');
+      n.style.setProperty('stroke-linecap', 'round', 'important');
+    } else {
+      n.style.setProperty('stroke', 'none', 'important');
+      n.style.setProperty('stroke-width', '0', 'important');
+      n.style.removeProperty('vector-effect');
+      n.style.removeProperty('stroke-alignment');
+      n.style.removeProperty('paint-order');
+      n.style.removeProperty('stroke-linejoin');
+      n.style.removeProperty('stroke-linecap');
+    }
+  });
+}
+
+function applyStyleToSelection() {
   if (!selectedEls || selectedEls.size === 0) return;
 
   selectedEls.forEach((el) => {
@@ -2941,26 +2934,7 @@ function pcSdInnerStrokeSvg(svg, color, innerPx) {
     el.style.setProperty('--stencil-color', currentColor);
 
     const svg = el.querySelector('svg');
-    if (svg) {
-      svg.querySelectorAll('*').forEach((n) => {
-        const tag = (n.tagName || '').toLowerCase();
-        if (tag === 'svg') return;
-
-        // ALWAYS: fill uses currentColor
-        n.style.setProperty('fill', currentColor, 'important');
-        // Outline is separate + optional
-if (outlineOn) {
-  n.style.setProperty('stroke', outlineColor, 'important');
-  n.style.setProperty('stroke-width', String(outlineWidth), 'important');
-  n.style.setProperty('paint-order', 'fill stroke', 'important');
-  n.style.setProperty('stroke-linejoin', 'round', 'important');
-  n.style.setProperty('stroke-linecap', 'round', 'important');
-} else {
-  n.style.setProperty('stroke', 'none', 'important');
-  n.style.setProperty('stroke-width', '0', 'important');
-}     
-      });
-    }
+    if (svg) applySvgFillAndOutline(svg, currentColor);
 
     // Raster images: fake outline using layered drop-shadows
     const img = el.querySelector('img');
@@ -3944,6 +3918,7 @@ if (hint) {
     n.removeAttribute('style');
     n.removeAttribute('fill');
     n.removeAttribute('stroke');
+    n.removeAttribute('stroke-width');
   });
 
   el.appendChild(svgEl);
@@ -5172,24 +5147,9 @@ function createOutlineSwatches(list, containerId) {
 
       selectedEls.forEach((el) => {
         const svg = el.querySelector('svg');
-        if (svg) {
-          svg.querySelectorAll('*').forEach((n) => {
-            const tag = (n.tagName || '').toLowerCase();
-            if (tag === 'svg') return;
-
-            // Only update stroke properties, leave fill alone
-            // Only update stroke properties, leave fill alone
-if (outlineOn) {
-  n.style.setProperty('stroke', outlineColor, 'important');
-  n.style.setProperty('stroke-width', String(Math.max(0.75, outlineWidth * 0.35)), 'important');
-  n.style.setProperty('vector-effect', 'non-scaling-stroke', 'important');
-  n.style.setProperty('paint-order', 'fill stroke', 'important');
-  n.style.setProperty('stroke-linejoin', 'round', 'important');
-  n.style.setProperty('stroke-linecap', 'round', 'important');
-}
-           
-          });
-        }
+        if (!svg) return;
+        const fillColor = el.style.getPropertyValue('--stencil-color') || currentColor;
+        applySvgFillAndOutline(svg, fillColor.trim() || currentColor);
       });
     });
 
