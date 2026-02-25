@@ -3606,7 +3606,7 @@ window.PCSD.state = () => ({
 
   // Keep extra breathing room only for the initial porch-board fit.
   if (initialPorchFit) {
-    const PORCH_INITIAL_MARGIN_FACTOR = 0.9;
+    const PORCH_INITIAL_MARGIN_FACTOR = 0.78;
     availW *= PORCH_INITIAL_MARGIN_FACTOR;
     availH *= PORCH_INITIAL_MARGIN_FACTOR;
   }
@@ -3616,7 +3616,13 @@ window.PCSD.state = () => ({
   availH -= barH;
 
   const zoom = Math.min(availW / boardW, availH / boardH);
-  const clamped = Math.max(0.25, Math.min(1, zoom));
+  let clamped = Math.max(0.25, Math.min(1, zoom));
+
+  // Porch board still renders visually oversized at full fit in this layout;
+  // cap its initial auto-fit to the known-good 70% view.
+  if (initialPorchFit) {
+    clamped = Math.min(clamped, 0.7);
+  }
 
   if (!userSetZoom) {
     setZoom(clamped);
@@ -4150,9 +4156,8 @@ function updateBoard({ isFlip = false } = {}) {
     }
   }
 
-  // Fit board ONLY once on initial load (never during a flip)
-  if (!isFlip && !userSetZoom && !root.__pc_sd_has_fitted_once) {
-    root.__pc_sd_has_fitted_once = true;
+  // Auto-fit when board changes (or initial load), unless user manually set zoom.
+  if (!isFlip && !userSetZoom) {
     fitBoardToViewport({ initialPorchFit: val === 'porch' });
   }
 
