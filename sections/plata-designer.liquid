@@ -3586,7 +3586,7 @@ window.PCSD.state = () => ({
     result.push(cur.trim());
     return result.map(v => v.replace(/^"|"$/g, '').trim());
   }
- function fitBoardToViewport() {
+ function fitBoardToViewport({ initialPorchFit = false } = {}) {
   const wrap = root.querySelector('.pc-sd__canvas-wrapper');
   const area = root.querySelector('.pc-sd__canvas-scroll-area');
   if (!wrap || !area) return;
@@ -3603,6 +3603,13 @@ window.PCSD.state = () => ({
 
   let availW = Math.max(120, areaRect.width - padX);
   let availH = Math.max(180, areaRect.height - padY);
+
+  // Keep extra breathing room only for the initial porch-board fit.
+  if (initialPorchFit) {
+    const PORCH_INITIAL_MARGIN_FACTOR = 0.9;
+    availW *= PORCH_INITIAL_MARGIN_FACTOR;
+    availH *= PORCH_INITIAL_MARGIN_FACTOR;
+  }
 
   const bar = root.querySelector('.pc-sd__bottombar');
   const barH = bar ? bar.getBoundingClientRect().height : 0;
@@ -4146,7 +4153,7 @@ function updateBoard({ isFlip = false } = {}) {
   // Fit board ONLY once on initial load (never during a flip)
   if (!isFlip && !userSetZoom && !root.__pc_sd_has_fitted_once) {
     root.__pc_sd_has_fitted_once = true;
-    fitBoardToViewport();
+    fitBoardToViewport({ initialPorchFit: val === 'porch' });
   }
 
   // Bind resize/orientation once
