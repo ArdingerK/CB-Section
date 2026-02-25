@@ -342,7 +342,7 @@
 
       <div class="pc-sd__quicktools" aria-label="Quick tools">
         <button type="button" class="pc-sd__quicktools-close" data-qt-collapse aria-label="Collapse quick tools">X</button>
-        <div class="pc-sd__quicktools-main">
+        <div class="pc-sd__qt-row">
           <button type="button" class="pc-sd__qt" data-qt="rotateL" aria-label="Rotate left">⟲</button>
           <button type="button" class="pc-sd__qt" data-qt="rotateR" aria-label="Rotate right">⟳</button>
           <button type="button" class="pc-sd__qt" data-qt="delete" aria-label="Delete selected stencil">🗑</button>
@@ -2610,13 +2610,13 @@ font-weight: bold;
   z-index: 40 !important;
 }
 
-.pc-sd__quicktools-main{
+.pc-sd__qt-row{
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.pc-sd__quicktools .pc-sd__quicktools-main > .pc-sd__qt{
+.pc-sd__quicktools .pc-sd__qt-row > .pc-sd__qt{
   width: 56px;
 }
 
@@ -2738,24 +2738,21 @@ font-weight: bold;
     left: auto !important;
     transform: none !important;
 
-    display: flex !important;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 8px;
-
-    padding: 10px 34px 10px 10px;
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 0 !important;
+    padding: 10px;
     border-radius: 12px;
   }
 
-  .pc-sd__quicktools-main{
+  .pc-sd__qt-row{
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    align-items: center;
     gap: 8px;
   }
 
-  .pc-sd__quicktools .pc-sd__quicktools-main > .pc-sd__qt{
+  .pc-sd__quicktools .pc-sd__qt-row > .pc-sd__qt{
     width: 40px;
     height: 40px;
   }
@@ -2782,6 +2779,9 @@ font-weight: bold;
 
   .pc-sd__quicktools-tab{
     display: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
     width: 36px;
     height: 36px;
     border-radius: 8px;
@@ -2797,18 +2797,12 @@ font-weight: bold;
   }
 
   .pc-sd__quicktools.is-collapsed{
-    width: auto;
-    height: auto;
+    width: 56px;
+    height: 56px;
     padding: 0;
-    border: 0;
-    background: transparent;
-    border-radius: 0;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
   }
 
-  .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-main,
+  .pc-sd__quicktools.is-collapsed .pc-sd__qt-row,
   .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-close{
     display: none !important;
   }
