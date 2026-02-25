@@ -4064,7 +4064,7 @@ const rect = stageEl.getBoundingClientRect();
     if (hint) hint.style.display = 'block';
   }
 
-function updateBoard() {
+function updateBoard({ isFlip = false } = {}) {
   console.log("updateBoard called");
 
   const val = root.querySelector('.pc-sd__board-select').value;
@@ -4116,8 +4116,8 @@ function updateBoard() {
     }
   }
 
-  // Fit board ONLY once on initial load
-  if (!userSetZoom && !root.__pc_sd_has_fitted_once) {
+  // Fit board ONLY once on initial load (never during a flip)
+  if (!isFlip && !userSetZoom && !root.__pc_sd_has_fitted_once) {
     root.__pc_sd_has_fitted_once = true;
     fitBoardToViewport();
   }
@@ -4129,13 +4129,15 @@ function updateBoard() {
     window.addEventListener('orientationchange', () => fitBoardToViewport(), { passive: true });
   }
 
-  // Re-apply layout logic
+  // Re-apply layout logic (skip scale recalculation on flip)
   setTimeout(() => {
-    stage.querySelectorAll('.pc-sd__placed').forEach(applyScale);
+    if (!isFlip) {
+      stage.querySelectorAll('.pc-sd__placed').forEach(applyScale);
+      buildPackListsFromLib(LIB);
+      refreshPackSelectOptions();
+      updateStencilFiltering();
+    }
     updateHintVisibility();
-    buildPackListsFromLib(LIB);
-    refreshPackSelectOptions();
-    updateStencilFiltering();
   }, 50);
 }
 
@@ -4977,20 +4979,8 @@ flipBtn.addEventListener('click', () => {
   // Toggle orientation relative to each board's default orientation
   canvas.dataset.flipped = (canvas.dataset.flipped === 'true') ? 'false' : 'true';
 
-  // Preserve current zoom while flipping.
-  const currentZoom =
-    parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
-
-  // TEMP disable auto-fit
-  const prevUserSetZoom = userSetZoom;
-  userSetZoom = true;
-
-  updateBoard();
-
-  requestAnimationFrame(() => {
-    setZoom(currentZoom);
-    userSetZoom = prevUserSetZoom; // restore original state
-  });
+  // Flip should rotate only; do not modify zoom/scale state.
+  updateBoard({ isFlip: true });
 });
 
 
