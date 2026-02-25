@@ -4037,7 +4037,8 @@ const rect = stageEl.getBoundingClientRect();
 
     const flipped = canvas.dataset.flipped === 'true';
     const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
-    const isH = flipped ? !defaultIsH : defaultIsH;
+    const isWreath = boardVal === 'wreath';
+    const isH = isWreath ? defaultIsH : (flipped ? !defaultIsH : defaultIsH);
     const bW = isH ? Math.max(cfg.wIn, cfg.hIn) : Math.min(cfg.wIn, cfg.hIn);
     const bH = isH ? Math.min(cfg.wIn, cfg.hIn) : Math.max(cfg.wIn, cfg.hIn);
 
@@ -4068,7 +4069,8 @@ function updateBoard() {
 
   const flipped = canvas.dataset.flipped === 'true';
   const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
-  const isH = flipped ? !defaultIsH : defaultIsH;
+  const isWreath = val === 'wreath';
+  const isH = isWreath ? defaultIsH : (flipped ? !defaultIsH : defaultIsH);
   canvas.dataset.orientation = isH ? 'horizontal' : 'vertical';
 
   const base = Number(cfg.dW);
@@ -4077,18 +4079,15 @@ function updateBoard() {
 
   if (!base || !wIn || !hIn) return;
 
-  const isWreath = val === 'wreath';
   let w;
   let h;
 
   if (isWreath) {
-    // Wreath keeps its natural 15x5 ratio; flipping only swaps width/height.
+    // Wreath keeps fixed board dimensions; flip only rotates the image.
     const naturalW = base;
     const naturalH = base * (hIn / wIn);
-    const naturalIsH = wIn >= hIn;
-    const shouldSwap = isH !== naturalIsH;
-    w = shouldSwap ? naturalH : naturalW;
-    h = shouldSwap ? naturalW : naturalH;
+    w = naturalW;
+    h = naturalH;
   } else {
     // Calculate board in its natural orientation from width/height ratio.
     const naturalW = base;
