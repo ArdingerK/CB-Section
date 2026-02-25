@@ -910,6 +910,15 @@ width: var(--boardWpx);
   height:var(--boardWpx);
   transform:translate(-50%,-50%) rotate(90deg);
 }
+.pc-sd__canvas.is-wreath-rotated{
+  transform-origin:center center;
+}
+.pc-sd__canvas.is-wreath-rotated .pc-sd__board-img-el{
+  width:100%;
+  height:100%;
+  transform-origin:center center;
+  transform:translate(-50%,-50%) rotate(90deg);
+}
 .pc-sd__stage{ position:absolute; inset:0; z-index:5; }
 
 /* hint pill */
@@ -4068,22 +4077,33 @@ function updateBoard() {
 
   if (!base || !wIn || !hIn) return;
 
-  // Calculate board in its natural orientation from width/height ratio
-  const naturalW = base;
-  const naturalH = base * (hIn / wIn);
-  const naturalIsH = wIn >= hIn;
+  const isWreath = val === 'wreath';
+  let w;
+  let h;
 
-  // Flip by swapping dimensions only when target orientation differs from natural
-  const shouldSwap = isH !== naturalIsH;
-  const w = shouldSwap ? naturalH : naturalW;
-  const h = shouldSwap ? naturalW : naturalH;
+  if (isWreath) {
+    // Keep wreath board dimensions stable when rotated; rotate image only.
+    w = base;
+    h = base * (hIn / wIn);
+  } else {
+    // Calculate board in its natural orientation from width/height ratio.
+    const naturalW = base;
+    const naturalH = base * (hIn / wIn);
+    const naturalIsH = wIn >= hIn;
+
+    // Flip by swapping dimensions only when target orientation differs from natural.
+    const shouldSwap = isH !== naturalIsH;
+    w = shouldSwap ? naturalH : naturalW;
+    h = shouldSwap ? naturalW : naturalH;
+  }
 
   // Set canvas size ONLY
   const canvasEl = root.querySelector('.pc-sd__canvas');
   if (canvasEl) {
     canvasEl.style.setProperty('--boardWpx', `${w}px`);
     canvasEl.style.setProperty('--boardHpx', `${h}px`);
-    canvasEl.classList.toggle('is-flipped', flipped);
+    canvasEl.classList.toggle('is-flipped', flipped && !isWreath);
+    canvasEl.classList.toggle('is-wreath-rotated', flipped && isWreath);
   }
 
   // Background image
@@ -4958,12 +4978,25 @@ const flipBtn = root.querySelector('[data-orientation-toggle]');
 flipBtn.addEventListener('click', () => {
   if (!canvas) return;
 
-  // Preserve current zoom
-  const currentZoom =
-    parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
+  const boardVal = root.querySelector('.pc-sd__board-select')?.value || 'porch';
 
   // Toggle orientation relative to each board's default orientation
   canvas.dataset.flipped = (canvas.dataset.flipped === 'true') ? 'false' : 'true';
+
+  // Wreath board rotation should only rotate in place (no sizing/fit recalculation).
+  if (boardVal === 'wreath') {
+    const canvasEl = root.querySelector('.pc-sd__canvas');
+    if (canvasEl) {
+      const flipped = canvas.dataset.flipped === 'true';
+      canvasEl.classList.toggle('is-wreath-rotated', flipped);
+      canvasEl.classList.remove('is-flipped');
+    }
+    return;
+  }
+
+  // Preserve current zoom for non-wreath boards.
+  const currentZoom =
+    parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
 
   // TEMP disable auto-fit
   const prevUserSetZoom = userSetZoom;
