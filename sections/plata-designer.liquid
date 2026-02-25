@@ -341,11 +341,13 @@
     <div class="pc-sd__canvas-scroll-area">
 
       <div class="pc-sd__quicktools" aria-label="Quick tools">
+        <button type="button" class="pc-sd__quicktools-close" data-qt-collapse aria-label="Collapse quick tools">X</button>
         <div class="pc-sd__quicktools-main">
           <button type="button" class="pc-sd__qt" data-qt="rotateL" aria-label="Rotate left">⟲</button>
           <button type="button" class="pc-sd__qt" data-qt="rotateR" aria-label="Rotate right">⟳</button>
           <button type="button" class="pc-sd__qt" data-qt="delete" aria-label="Delete selected stencil">🗑</button>
         </div>
+        <button type="button" class="pc-sd__quicktools-tab" data-qt-expand aria-label="Expand quick tools">⟪</button>
       </div>
 
       <!-- Board wrapper for centered canvas -->
@@ -2719,6 +2721,98 @@ font-weight: bold;
   padding-bottom: 140px; /* fallback only — JS will override */
 }
 
+.pc-sd__quicktools-close,
+.pc-sd__quicktools-tab{
+  display: none;
+}
+
+@media (min-width: 990px){
+  .pc-sd__canvas-scroll-area{
+    position: relative !important;
+  }
+
+  .pc-sd__quicktools{
+    position: absolute !important;
+    top: 16px !important;
+    right: -60px !important;
+    left: auto !important;
+    transform: none !important;
+
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 34px 10px 10px;
+    border-radius: 12px;
+  }
+
+  .pc-sd__quicktools-main{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .pc-sd__quicktools .pc-sd__quicktools-main > .pc-sd__qt{
+    width: 40px;
+    height: 40px;
+  }
+
+  .pc-sd__quicktools-close{
+    position: absolute;
+    top: 6px;
+    right: 6px;
+
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #111;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pc-sd__quicktools-tab{
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,.2);
+    background: #fff;
+    color: #111;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pc-sd__quicktools.is-collapsed{
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 8px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-main,
+  .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-close{
+    display: none !important;
+  }
+
+  .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-tab{
+    display: inline-flex;
+  }
+}
 </style>
 
 <script>
@@ -4180,7 +4274,7 @@ function rotateSelected(direction) {
   root.__pc_sd_actions_bound = true;
 
   root.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-qt], [data-rotate-left], [data-rotate-right], [data-delete-selected], [data-clear-board]');
+    const btn = e.target.closest('[data-qt], [data-rotate-left], [data-rotate-right], [data-delete-selected], [data-clear-board], [data-qt-collapse], [data-qt-expand]');
     if (!btn || !root.contains(btn)) return;
 
     if (btn.matches('[data-rotate-left]') || btn.getAttribute('data-qt') === 'rotateL') {
@@ -4198,6 +4292,22 @@ function rotateSelected(direction) {
       return;
     }
 
+
+    if (btn.matches('[data-qt-collapse]')) {
+      const quicktools = btn.closest('.pc-sd__quicktools');
+      if (quicktools && window.matchMedia('(min-width: 990px)').matches) {
+        quicktools.classList.add('is-collapsed');
+      }
+      return;
+    }
+
+    if (btn.matches('[data-qt-expand]')) {
+      const quicktools = btn.closest('.pc-sd__quicktools');
+      if (quicktools) {
+        quicktools.classList.remove('is-collapsed');
+      }
+      return;
+    }
     if (btn.matches('[data-clear-board]')) {
       clearBoard();
     }
