@@ -340,21 +340,21 @@
   <div class="pc-sd__canvas-container">
     <div class="pc-sd__canvas-scroll-area">
 
-      <div class="pc-sd__quicktools" aria-label="Quick tools">
-        <button type="button" class="pc-sd__qt-collapse" data-qt-collapse aria-label="Collapse quick tools">×</button>
-        <div class="pc-sd__quicktools-main">
-          <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
-          <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
-          <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
-          <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
-          <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
-          <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
-        </div>
-        <button type="button" class="pc-sd__qt-expand" data-qt-expand aria-label="Open quick tools">🛠</button>
-      </div>
-
       <!-- Board + Quicktools need a common positioned anchor -->
       <div class="pc-sd__canvas-wrapper">
+        <div class="pc-sd__quicktools" aria-label="Quick tools">
+          <button type="button" class="pc-sd__qt-collapse" data-qt-collapse aria-label="Collapse quick tools">×</button>
+          <div class="pc-sd__quicktools-main">
+            <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
+            <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
+            <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
+            <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
+            <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
+            <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
+          </div>
+          <button type="button" class="pc-sd__qt-expand" data-qt-expand aria-label="Open quick tools">🛠</button>
+        </div>
+
         <div class="pc-sd__canvas-wrap">
 
           <!-- Hint sits OUTSIDE the clipped board -->
@@ -2656,7 +2656,7 @@ font-weight: bold;
   .pc-sd__quicktools{
     position: absolute !important;
     top: 16px !important;
-    right: 16px !important;
+    right: -60px !important;
     left: auto !important;
     transform: none !important;
     transition: width .18s ease, transform .18s ease, padding .18s ease;
