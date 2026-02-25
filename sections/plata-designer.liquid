@@ -4331,9 +4331,18 @@ function rotateSelected(direction) {
     const closeBtn = quicktools.querySelector('[data-qt-collapse]');
     const expandBtn = quicktools.querySelector('[data-qt-expand]');
 
-    if (stack) stack.hidden = isCollapsed;
-    if (closeBtn) closeBtn.hidden = isCollapsed;
-    if (expandBtn) expandBtn.hidden = !isCollapsed;
+    if (stack) {
+      stack.hidden = isCollapsed;
+      stack.style.display = isCollapsed ? 'none' : '';
+    }
+    if (closeBtn) {
+      closeBtn.hidden = isCollapsed;
+      closeBtn.style.display = isCollapsed ? 'none' : '';
+    }
+    if (expandBtn) {
+      expandBtn.hidden = !isCollapsed;
+      expandBtn.style.display = isCollapsed ? '' : 'none';
+    }
   }
 
   root.addEventListener('click', (e) => {
