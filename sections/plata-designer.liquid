@@ -3589,11 +3589,14 @@ window.PCSD.state = () => ({
  function fitBoardToViewport({ initialPorchFit = false } = {}) {
   const wrap = root.querySelector('.pc-sd__canvas-wrapper');
   const area = root.querySelector('.pc-sd__canvas-scroll-area');
-  if (!wrap || !area) return;
+  const canvasEl = root.querySelector('.pc-sd__canvas');
+  if (!wrap || !area || !canvasEl) return;
 
-  // Get board size from CSS variables (already set by updateBoard)
-  const boardW = parseFloat(getComputedStyle(wrap).getPropertyValue('--boardWpx'));
-  const boardH = parseFloat(getComputedStyle(wrap).getPropertyValue('--boardHpx'));
+  // Get board size from CSS variables (set on .pc-sd__canvas by updateBoard).
+  // NOTE: CSS custom properties inherit down, not up, so reading from wrapper
+  // can return an empty value and skip the auto-fit calculation.
+  const boardW = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardWpx'));
+  const boardH = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardHpx'));
   if (!boardW || !boardH) return;
 
   const areaRect = area.getBoundingClientRect();
