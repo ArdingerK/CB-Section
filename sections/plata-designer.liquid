@@ -346,12 +346,16 @@
 
           <!-- Quicktools anchored to the board wrapper (NOT the scroll area edge) -->
           <div class="pc-sd__quicktools" aria-label="Quick tools">
-            <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
-            <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
-            <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
-            <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
-            <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
-            <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
+            <button type="button" class="pc-sd__qt-collapse" data-qt-collapse aria-label="Collapse quick tools">×</button>
+            <div class="pc-sd__quicktools-main">
+              <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
+              <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
+              <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
+              <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
+              <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
+              <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
+            </div>
+            <button type="button" class="pc-sd__qt-expand" data-qt-expand aria-label="Open quick tools">🛠</button>
           </div>
 
           <!-- Hint sits OUTSIDE the clipped board -->
@@ -2607,9 +2611,77 @@ font-weight: bold;
 }
 
 /* If the buttons have fixed widths, this keeps them consistent */
-.pc-sd__quicktools > *{
+.pc-sd__quicktools .pc-sd__quicktools-main > .pc-sd__qt{
   width: 56px;                   /* adjust if you want bigger/smaller */
 }
+.pc-sd__qt-collapse,
+.pc-sd__qt-expand{
+  border: 1px solid rgba(0,0,0,.20);
+  background: #fff;
+  color: #111827;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.pc-sd__qt-collapse{
+  align-self: flex-end;
+  width: 22px;
+  height: 22px;
+  font-size: 16px;
+  display: none;
+}
+
+.pc-sd__qt-expand{
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  display: none;
+  place-items: center;
+}
+
+.pc-sd__quicktools-main{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 990px){
+  .pc-sd__quicktools{
+    top: 16px !important;
+    right: 12px !important;
+    left: auto !important;
+    transition: width .18s ease, transform .18s ease, padding .18s ease;
+  }
+
+  .pc-sd__quicktools .pc-sd__qt-collapse{
+    display: block;
+  }
+
+  .pc-sd__quicktools.is-collapsed{
+    padding: 8px !important;
+    border-radius: 12px;
+    gap: 0 !important;
+  }
+
+  .pc-sd__quicktools.is-collapsed .pc-sd__quicktools-main,
+  .pc-sd__quicktools.is-collapsed .pc-sd__qt-collapse{
+    display: none !important;
+  }
+
+  .pc-sd__quicktools.is-collapsed .pc-sd__qt-expand{
+    display: grid;
+  }
+}
+
+@media (max-width: 989px){
+  .pc-sd__qt-collapse,
+  .pc-sd__qt-expand{
+    display: none !important;
+  }
+}
+
 /* Make tile positionable */
 .pc-sd__item{
   position: relative;
@@ -3019,6 +3091,16 @@ function applyStyleToSelection() {
   const qt = root.querySelector('.pc-sd__quicktools');
 if (qt) {
     qt.addEventListener('click', (e) => {
+      if (e.target.closest('[data-qt-collapse]')) {
+        qt.classList.add('is-collapsed');
+        return;
+      }
+
+      if (e.target.closest('[data-qt-expand]')) {
+        qt.classList.remove('is-collapsed');
+        return;
+      }
+
       const b = e.target.closest('[data-qt]');
       if (!b) return;
 
