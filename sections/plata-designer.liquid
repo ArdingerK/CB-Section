@@ -3618,10 +3618,9 @@ window.PCSD.state = () => ({
   const zoom = Math.min(availW / boardW, availH / boardH);
   let clamped = Math.max(0.25, Math.min(1, zoom));
 
-  // Porch board still renders visually oversized at full fit in this layout;
-  // cap its initial auto-fit to the known-good 70% view.
+  // Porch board should always open at a fixed 70% zoom on initial load.
   if (initialPorchFit) {
-    clamped = Math.min(clamped, 0.7);
+    clamped = 0.7;
   }
 
   if (!userSetZoom) {
