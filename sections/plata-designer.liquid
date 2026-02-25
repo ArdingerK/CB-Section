@@ -2899,29 +2899,81 @@ if (saveBtn) {
   });
 }
 
+function getOrCreateInnerStrokeDefs(svg) {
+  let defs = svg.querySelector('defs[data-pcsd-inner-stroke="1"]');
+  if (!defs) {
+    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.setAttribute('data-pcsd-inner-stroke', '1');
+    svg.insertBefore(defs, svg.firstChild);
+  }
+  return defs;
+}
+
+function ensureSvgInstanceId(svg) {
+  if (!svg.dataset.pcsdSvgId) {
+    svg.dataset.pcsdSvgId = `pcsd-svg-${Math.random().toString(36).slice(2, 10)}`;
+  }
+  return svg.dataset.pcsdSvgId;
+}
+
+function upsertInnerStrokeClipPath(svg, node, idx) {
+  const svgId = ensureSvgInstanceId(svg);
+  const defs = getOrCreateInnerStrokeDefs(svg);
+  const clipId = `${svgId}-inner-clip-${idx}`;
+
+  let clip = defs.querySelector(`#${clipId}`);
+  if (!clip) {
+    clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+    clip.setAttribute('id', clipId);
+    clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    defs.appendChild(clip);
+  }
+
+  const clone = node.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.removeAttribute('clip-path');
+  clone.style.removeProperty('clip-path');
+  clone.removeAttribute('mask');
+  clone.style.removeProperty('mask');
+  clone.removeAttribute('filter');
+  clone.style.removeProperty('filter');
+  clone.removeAttribute('stroke');
+  clone.removeAttribute('stroke-width');
+  clone.style.removeProperty('stroke');
+  clone.style.removeProperty('stroke-width');
+  clone.setAttribute('fill', '#fff');
+  clone.style.setProperty('fill', '#fff', 'important');
+
+  clip.replaceChildren(clone);
+  return clipId;
+}
+
 function applySvgFillAndOutline(svg, fillColor) {
   const nodes = getSvgOutlineTargets(svg);
   if (!nodes.length) return;
 
-  nodes.forEach((n) => {
+  nodes.forEach((n, idx) => {
     n.style.setProperty('fill', fillColor, 'important');
 
     if (outlineOn) {
+      const clipId = upsertInnerStrokeClipPath(svg, n, idx);
+
       n.style.setProperty('stroke', outlineColor, 'important');
-      n.style.setProperty('stroke-width', String(outlineWidth), 'important');
+      n.style.setProperty('stroke-width', String(outlineWidth * 2), 'important');
       n.style.setProperty('vector-effect', 'non-scaling-stroke', 'important');
-      n.style.setProperty('stroke-alignment', 'inner', 'important');
       n.style.setProperty('paint-order', 'fill stroke', 'important');
       n.style.setProperty('stroke-linejoin', 'round', 'important');
       n.style.setProperty('stroke-linecap', 'round', 'important');
+      n.style.setProperty('clip-path', `url(#${clipId})`, 'important');
     } else {
       n.style.setProperty('stroke', 'none', 'important');
       n.style.setProperty('stroke-width', '0', 'important');
       n.style.removeProperty('vector-effect');
-      n.style.removeProperty('stroke-alignment');
       n.style.removeProperty('paint-order');
       n.style.removeProperty('stroke-linejoin');
       n.style.removeProperty('stroke-linecap');
+      n.style.removeProperty('clip-path');
+      n.removeAttribute('clip-path');
     }
   });
 }
