@@ -3018,20 +3018,6 @@ function applyStyleToSelection() {
 }
 
 
-  // Quick tools widget
-  const qt = root.querySelector('.pc-sd__quicktools');
-  if (qt) {
-    qt.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-qt]');
-      if (!b) return;
-
-      const which = b.getAttribute('data-qt');
-      if (which === 'rotateL') root.querySelector('[data-rotate-left]')?.click();
-      if (which === 'rotateR') root.querySelector('[data-rotate-right]')?.click();
-      if (which === 'delete') root.querySelector('[data-delete-selected]')?.click();
-    });
-  }
-
   let userSetZoom = false;
 
 window.addEventListener('error', (e) => {
@@ -4177,20 +4163,45 @@ function deleteSelected() {
 }
 
 
-// Bind Step 3 buttons ONCE
-(function bindStep3ButtonsOnce(){
-  if (root.__pc_sd_step3_bound) return;
-  root.__pc_sd_step3_bound = true;
+function rotateSelected(direction) {
+  if (!selectedEls || selectedEls.size === 0) return;
 
-  const btnL = root.querySelector('[data-rotate-left]');
-  const btnR = root.querySelector('[data-rotate-right]');
-  const btnD = root.querySelector('[data-delete-selected]');
-  const btnC = root.querySelector('[data-clear-board]');
+  selectedEls.forEach((el) => {
+    const current = Number(el.dataset.rot || 0);
+    const next = current + Number(direction || 0);
+    el.dataset.rot = String(next);
+    el.style.setProperty('--rot', String(next));
+  });
+}
 
-  if (btnL) btnL.addEventListener('click', () => rotateSelected(-15));
-  if (btnR) btnR.addEventListener('click', () => rotateSelected(15));
-  if (btnD) btnD.addEventListener('click', () => deleteSelected());
-  if (btnC) btnC.addEventListener('click', () => clearBoard());
+// Bind rotate/delete/clear controls ONCE via root delegation
+(function bindDesignerActionsOnce(){
+  if (root.__pc_sd_actions_bound) return;
+  root.__pc_sd_actions_bound = true;
+
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-qt], [data-rotate-left], [data-rotate-right], [data-delete-selected], [data-clear-board]');
+    if (!btn || !root.contains(btn)) return;
+
+    if (btn.matches('[data-rotate-left]') || btn.getAttribute('data-qt') === 'rotateL') {
+      rotateSelected(-15);
+      return;
+    }
+
+    if (btn.matches('[data-rotate-right]') || btn.getAttribute('data-qt') === 'rotateR') {
+      rotateSelected(15);
+      return;
+    }
+
+    if (btn.matches('[data-delete-selected]') || btn.getAttribute('data-qt') === 'delete') {
+      deleteSelected();
+      return;
+    }
+
+    if (btn.matches('[data-clear-board]')) {
+      clearBoard();
+    }
+  });
 })();
 
 function updateStencilFiltering() {
