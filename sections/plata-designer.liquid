@@ -340,21 +340,21 @@
   <div class="pc-sd__canvas-container">
     <div class="pc-sd__canvas-scroll-area">
 
-      <!-- Board + Quicktools need a common positioned anchor -->
-      <div class="pc-sd__canvas-wrapper">
-        <div class="pc-sd__quicktools" aria-label="Quick tools">
-          <button type="button" class="pc-sd__qt-collapse" data-qt-collapse aria-label="Collapse quick tools">×</button>
-          <div class="pc-sd__quicktools-main">
-            <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
-            <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
-            <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
-            <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
-            <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
-            <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
-          </div>
-          <button type="button" class="pc-sd__qt-expand" data-qt-expand aria-label="Open quick tools">🛠</button>
+      <div class="pc-sd__quicktools" aria-label="Quick tools">
+        <button type="button" class="pc-sd__qt-collapse" data-qt-collapse aria-label="Collapse quick tools">×</button>
+        <div class="pc-sd__quicktools-main">
+          <button type="button" class="pc-sd__qt" data-qt="letters">🔤</button>
+          <button type="button" class="pc-sd__qt" data-qt="design">🌸</button>
+          <button type="button" class="pc-sd__qt" data-qt="colors">🎨</button>
+          <button type="button" class="pc-sd__qt" data-qt="rotateL">⟲</button>
+          <button type="button" class="pc-sd__qt" data-qt="rotateR">⟳</button>
+          <button type="button" class="pc-sd__qt" data-qt="delete">🗑</button>
         </div>
+        <button type="button" class="pc-sd__qt-expand" data-qt-expand aria-label="Open quick tools">🛠</button>
+      </div>
 
+      <!-- Board wrapper for centered canvas -->
+      <div class="pc-sd__canvas-wrapper">
         <div class="pc-sd__canvas-wrap">
 
           <!-- Hint sits OUTSIDE the clipped board -->
@@ -1930,7 +1930,7 @@ margin-bottom: 6px;
 .pc-sd__quicktools{
   position: absolute !important;
   top: 16px !important;
-  right: 12px !important;
+  right: 16px !important;
   transform: none !important;
   z-index: 40 !important;
 }
@@ -2605,10 +2605,13 @@ font-weight: bold;
   filter: none;
 }
 .pc-sd__quicktools{
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;          /* spacing between buttons */
-  align-items: center !important; /* keeps buttons centered */
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 40 !important;
+  transition: width .18s ease, transform .18s ease, padding .18s ease;
 }
 
 /* If the buttons have fixed widths, this keeps them consistent */
@@ -2627,7 +2630,6 @@ font-weight: bold;
 }
 
 .pc-sd__qt-collapse{
-  align-self: flex-end;
   width: 22px;
   height: 22px;
   font-size: 16px;
@@ -2649,14 +2651,14 @@ font-weight: bold;
 }
 
 @media (min-width: 990px){
-  .pc-sd__canvas-wrapper{
+  .pc-sd__canvas-scroll-area{
     position: relative !important;
   }
 
   .pc-sd__quicktools{
     position: absolute !important;
     top: 16px !important;
-    right: -60px !important;
+    right: 16px !important;
     left: auto !important;
     transform: none !important;
     transition: width .18s ease, transform .18s ease, padding .18s ease;
