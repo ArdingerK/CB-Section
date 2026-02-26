@@ -308,6 +308,31 @@
       </div><!-- /.pc-sd__drawer-panel -->
     </div><!-- /.pc-sd__drawer (tools) -->
 
+<!-- STEP 4 -->
+<div class="pc-sd__bottombar" role="region" aria-label="Save or add to cart">
+  <div class="pc-sd__bottombar-text">
+    <div class="pc-sd__step4head">
+      <span class="pc-sd__stepnum pc-sd__stepnum--inline">4</span>
+      <span class="pc-sd__love pc-sd__love--hand">Love how it turned out?</span>
+    </div>
+
+    <div class="pc-sd__step4sub">
+      Save <strong>20%</strong> on stencil packs
+      <span class="pc-sd__dot">•</span> buy <strong>2+</strong> packs
+      <span class="pc-sd__dot">•</span> or bundle with a chalkboard
+    </div>
+  </div>
+
+  <div class="pc-sd__bottombar-actions">
+    <button type="button" class="pc-sd__btn pc-sd__btn--ghost" data-export-image>
+      Save as PNG
+    </button>
+    <button type="button" class="pc-sd__btn pc-sd__btn--primary" data-add-to-cart-design>
+      Add Design to Cart
+    </button>
+  </div>
+</div>
+
   </div><!-- /.pc-sd__sidebar -->
 
   <!-- RIGHT: Canvas goes here (not included in your snippet) -->
@@ -370,31 +395,6 @@
 
     </div><!-- /.pc-sd__canvas-scroll-area -->
   </div><!-- /.pc-sd__canvas-container -->
-  <!-- STEP 4 -->
-<div class="pc-sd__bottombar" role="region" aria-label="Save or add to cart">
-  <div class="pc-sd__bottombar-text">
-    <div class="pc-sd__step4head">
-      <span class="pc-sd__stepnum pc-sd__stepnum--inline">4</span>
-      <span class="pc-sd__love pc-sd__love--hand">Love how it turned out?</span>
-    </div>
-
-    <div class="pc-sd__step4sub">
-      Save <strong>20%</strong> on stencil packs
-      <span class="pc-sd__dot">•</span> buy <strong>2+</strong> packs
-      <span class="pc-sd__dot">•</span> or bundle with a chalkboard
-    </div>
-  </div>
-
-  <div class="pc-sd__bottombar-actions">
-    <button type="button" class="pc-sd__btn pc-sd__btn--ghost" data-export-image>
-      Save as PNG
-    </button>
-    <button type="button" class="pc-sd__btn pc-sd__btn--primary" data-add-to-cart-design>
-      Add Design to Cart
-    </button>
-  </div>
-</div>
-
 </div><!-- /.pc-sd__rightcol -->
 
 </div><!-- /.pc-sd__layout -->
@@ -851,6 +851,15 @@
   height: auto !important;      /* remove fixed height */
   overflow: visible !important; /* stop clipping the bottom bar */
 }
+.pc-sd__sidebar{
+  flex: 0 0 min(560px, 42vw) !important;
+  width: min(560px, 42vw) !important;
+}
+.pc-sd__sidebar > .pc-sd__bottombar{
+  width: 100%;
+  max-width: none;
+  margin: 12px 0 0;
+}
 
 .pc-sd__canvas-container{
   flex: 1 1 auto;
@@ -872,13 +881,9 @@
   justify-content: center;
   align-items: center;
 }
-.pc-sd .pc-sd__canvas-scroll-area{
-  padding-bottom: var(--pc-bottom-clearance, 140px) !important;
-}
 .pc-sd__canvas-container,
 .pc-sd__canvas-scroll-area{
   background: transparent !important;
-  padding-bottom: var(--pc-bottom-clearance, 140px);
 }
 
 /* board wrapper */
@@ -3778,11 +3783,6 @@ window.PCSD.state = () => ({
     availH *= PORCH_INITIAL_MARGIN_FACTOR;
   }
 
-  const bar = root.querySelector('.pc-sd__bottombar');
-  const barH = bar ? bar.getBoundingClientRect().height : 0;
-  availH -= barH;
-
-  syncCanvasBottomClearance();
 
   const zoom = Math.min(availW / boardW, availH / boardH);
   let clamped = Math.max(0.25, Math.min(1, zoom));
@@ -4317,8 +4317,6 @@ function updateBoard({ isFlip = false } = {}) {
   if (!isFlip && !userSetZoom) {
     fitBoardToViewport({ initialPorchFit: val === 'porch' });
   }
-
-  syncCanvasBottomClearance();
 
   // Bind resize/orientation once
   if (!root.__pc_sd_fit_bound) {
@@ -5333,32 +5331,7 @@ function setZoom(z, { fromUser = false } = {}) {
     canvasFound: !!canvasEl
   });
 
-  syncCanvasBottomClearance();
-
   positionHintOverBoard();
-}
-
-function syncCanvasBottomClearance() {
-  const scrollArea = root.querySelector('.pc-sd__canvas-scroll-area');
-  const bar = root.querySelector('.pc-sd__bottombar');
-  const wrap = root.querySelector('.pc-sd__canvas-wrapper');
-  const canvasEl = root.querySelector('.pc-sd__canvas');
-  if (!scrollArea || !bar) return;
-
-  const barH = bar.getBoundingClientRect().height || 100;
-  const extraGap = 32;
-  const clearance = Math.ceil(barH + extraGap);
-
-  root.style.setProperty('--pc-bottom-clearance', `${clearance}px`);
-  scrollArea.style.paddingBottom = `${clearance}px`;
-
-  if (!wrap || !canvasEl) return;
-  const zoom = parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
-  const boardH = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardHpx')) || 0;
-  if (!boardH) return;
-
-  const minWrapperHeight = Math.ceil(boardH * zoom + clearance + 24);
-  wrap.style.minHeight = `${minWrapperHeight}px`;
 }
 
 // Wire handlers ONCE
