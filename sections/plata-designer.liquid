@@ -3126,6 +3126,43 @@ font-weight: bold;
   margin: 4px 0 8px !important;
 }
 
+/* Desktop workspace tuning:
+   - increase visible canvas height by ~30%
+   - keep Step 3 and Step 4 bottom-aligned/adjacent
+   - expose Step 3 outline controls without needing Step 3 scroll */
+@media (min-width: 990px){
+  .pc-sd__layout{
+    align-items: stretch !important;
+  }
+
+  .pc-sd__sidebar,
+  .pc-sd__rightcol{
+    height: min(calc((100vh - 160px) * 1.3), 1100px) !important;
+    max-height: min(calc((100vh - 160px) * 1.3), 1100px) !important;
+    min-height: 840px !important;
+  }
+
+  .pc-sd__canvas-scroll-area{
+    max-height: none !important;
+    min-height: 730px !important;
+    height: 100% !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__stepcard--3{
+    overflow: visible !important;
+    padding-bottom: 12px !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__sidebar-bottom{
+    overflow: visible !important;
+  }
+
+  .pc-sd__rightcol > .pc-sd__bottombar{
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+  }
+}
+
 </style>
 
 <script>
