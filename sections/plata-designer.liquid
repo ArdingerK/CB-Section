@@ -4084,7 +4084,7 @@ window.PCSD.state = () => ({
     result.push(cur.trim());
     return result.map(v => v.replace(/^"|"$/g, '').trim());
   }
- function fitBoardToViewport({ initialPorchFit = false } = {}) {
+function fitBoardToViewport({ initialPorchFit = false } = {}) {
   const wrap = root.querySelector('.pc-sd__canvas-wrapper');
   const area = root.querySelector('.pc-sd__canvas-scroll-area');
   const canvasEl = root.querySelector('.pc-sd__canvas');
@@ -4124,6 +4124,34 @@ window.PCSD.state = () => ({
   if (!userSetZoom) {
     setZoom(clamped);
   }
+}
+
+function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}) {
+  const area = root.querySelector('.pc-sd__canvas-scroll-area');
+  const canvasEl = root.querySelector('.pc-sd__canvas');
+  if (!area || !canvasEl) return;
+
+  const boardH = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardHpx'));
+  if (!boardH) return;
+
+  const cs = window.getComputedStyle(area);
+  const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+  const visibleHeight = Math.max(0, area.clientHeight - padY);
+  const scaledBoardH = boardH * (Number(zoom) || 1);
+  const isZoomingOut = Number(zoom) < Number(prevZoom);
+
+  requestAnimationFrame(() => {
+    // Initial auto-fit and user zoom-out should reveal the board top.
+    if (!fromUser || isZoomingOut || scaledBoardH <= visibleHeight + 1) {
+      area.scrollTop = 0;
+    }
+
+    // Keep board horizontally centered after zoom changes.
+    const maxLeft = Math.max(0, area.scrollWidth - area.clientWidth);
+    if (maxLeft > 0) {
+      area.scrollLeft = maxLeft / 2;
+    }
+  });
 }
 
   async function loadLibrary() {
@@ -5647,6 +5675,7 @@ if (!root.__pc_sd_hint_observer) {
 }
 
 function setZoom(z, { fromUser = false } = {}) {
+  const prevZoom = parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
   if (fromUser) userSetZoom = true;
 
   const zoom = Math.max(0.25, Math.min(2.5, Number(z) || 1));
@@ -5670,6 +5699,8 @@ function setZoom(z, { fromUser = false } = {}) {
     wrapFound: !!wrap,
     canvasFound: !!canvasEl
   });
+
+  adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser });
 
   positionHintOverBoard();
 }
