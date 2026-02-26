@@ -4223,16 +4223,10 @@ const rect = stageEl.getBoundingClientRect();
     const boardVal = root.querySelector('.pc-sd__board-select')?.value || 'porch';
     const cfg = boardConfigs[boardVal] || boardConfigs.porch;
 
-    const flipped = canvas.dataset.flipped === 'true';
-    const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
-    const isWreath = boardVal === 'wreath';
-    const isH = isWreath ? defaultIsH : (flipped ? !defaultIsH : defaultIsH);
-    const naturalWIn = Number(cfg.wIn);
-    const naturalHIn = Number(cfg.hIn);
-    const naturalIsH = naturalWIn >= naturalHIn;
-    const shouldSwap = isH !== naturalIsH;
-    const bW = shouldSwap ? naturalHIn : naturalWIn;
-    const bH = shouldSwap ? naturalWIn : naturalHIn;
+    // Keep stencil sizing tied to the board's real dimensions.
+    // Visual rotation must not rescale placed stencils.
+    const bW = Number(cfg.wIn);
+    const bH = Number(cfg.hIn);
 
     const sW = parseFloat(el.dataset.w) * 0.9;
     el.style.setProperty('--calc-width', (sW / bW * 100) + '%');
@@ -4262,8 +4256,7 @@ function updateBoard({ isFlip = false } = {}) {
   const flipped = canvas.dataset.flipped === 'true';
   const defaultIsH = (cfg.defaultOrientation || 'vertical') === 'horizontal';
   const isWreath = val === 'wreath';
-  const isH = isWreath ? defaultIsH : (flipped ? !defaultIsH : defaultIsH);
-  canvas.dataset.orientation = isH ? 'horizontal' : 'vertical';
+  canvas.dataset.orientation = defaultIsH ? 'horizontal' : 'vertical';
 
   const base = Number(cfg.dW);
   const wIn  = Number(cfg.wIn);
@@ -4271,15 +4264,9 @@ function updateBoard({ isFlip = false } = {}) {
 
   if (!base || !wIn || !hIn) return;
 
-  // Calculate board in its natural orientation from width/height ratio.
-  const naturalW = base;
-  const naturalH = base * (hIn / wIn);
-  const naturalIsH = wIn >= hIn;
-
-  // Flip by swapping dimensions only when target orientation differs from natural.
-  const shouldSwap = isH !== naturalIsH;
-  const w = shouldSwap ? naturalH : naturalW;
-  const h = shouldSwap ? naturalW : naturalH;
+  // Keep the board box dimensions stable. Rotation is visual-only.
+  const w = base;
+  const h = base * (hIn / wIn);
 
   // Set canvas size ONLY
   const canvasEl = root.querySelector('.pc-sd__canvas');
