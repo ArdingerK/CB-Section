@@ -2883,6 +2883,35 @@ font-weight: bold;
   .pc-sd__canvas{
     transform-origin: top center !important;
   }
+
+  /* Keep two-column layout, but prevent canvas column from driving page height. */
+  .pc-sd__rightcol,
+  .pc-sd__canvas-container{
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  /* Canvas owns its own scrolling with a capped viewport height. */
+  .pc-sd__canvas-scroll-area{
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 120px) !important;
+    overflow: auto !important;
+  }
+
+  /* Keep Step 3 followed by the bottom bar in normal document flow. */
+  .pc-sd__drawer[data-drawer="tools"]{
+    margin-top: 0 !important;
+  }
+
+  .pc-sd__sidebar > .pc-sd__bottombar,
+  .pc-sd__bottombar{
+    position: relative !important;
+    bottom: auto !important;
+    margin-top: 12px !important;
+    margin-bottom: 0 !important;
+  }
 }
 </style>
 
