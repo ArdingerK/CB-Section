@@ -3200,33 +3200,40 @@ font-weight: bold;
   }
 }
 
-/* Canvas spacing + edge fade: keep board clear of Step 4 and blend into workspace. */
-.pc-sd__canvas-container{
+/* Canvas spacing + right column fades */
+.pc-sd__canvas-scroll-area {
+  padding-top: 40px !important;
+  padding-bottom: 200px !important;
+  scroll-padding-top: 40px !important;
+  scroll-padding-bottom: 200px !important;
+}
+
+.pc-sd__rightcol {
   position: relative;
 }
 
-.pc-sd__canvas-scroll-area{
-  padding-bottom: 120px !important;
-  scroll-padding-bottom: 120px !important;
-}
-
-@media (min-width: 990px){
-  .pc-sd__canvas-scroll-area{
-    padding-bottom: 160px !important;
-    scroll-padding-bottom: 160px !important;
-  }
-}
-
-.pc-sd__canvas-container::after{
+.pc-sd__rightcol::before {
   content: '';
-  position: sticky;
-  bottom: 0;
-  display: block;
-  height: 72px;
-  margin-top: -72px;
-  background: linear-gradient(to bottom, transparent, #c8e8ec);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: linear-gradient(to bottom, #d6ebee 0%, transparent 100%);
   pointer-events: none;
-  z-index: 20;
+  z-index: 30;
+}
+
+.pc-sd__rightcol::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, #d6ebee 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 30;
 }
 
 </style>
