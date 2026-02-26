@@ -3000,11 +3000,12 @@ font-weight: bold;
 @media (min-width: 990px){
   .pc-sd__layout{
     align-items: stretch !important;
+    gap: 8px !important;
   }
 
   .pc-sd__sidebar,
   .pc-sd__rightcol{
-    max-height: calc(100vh - 220px) !important;
+    max-height: calc(100vh - 160px) !important;
     min-height: 0 !important;
   }
 
@@ -3029,9 +3030,28 @@ font-weight: bold;
 
   .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette{
     min-height: 0 !important;
-    max-height: 165px !important; /* ~2 visible rows */
+    max-height: 120px !important; /* keep Step 2 compact to free room for Step 3 */
     overflow-y: auto !important;
     overflow-x: hidden !important;
+  }
+
+  /* tighter cards = more visible workspace + Step 3 controls */
+  .pc-sd__stepcard--2,
+  .pc-sd__stepcard--3{
+    padding: 14px 16px !important;
+  }
+
+  .pc-sd__sidebar{
+    gap: 6px !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__stephead{
+    margin-bottom: 2px !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__step3-sub{
+    margin-bottom: 4px !important;
+    line-height: 1.1 !important;
   }
 
   /* Step 3 takes remaining sidebar height and owns its own scroll */
@@ -3058,9 +3078,9 @@ font-weight: bold;
   .pc-sd__drawer[data-drawer="tools"] .pc-sd__sidebar-bottom{
     flex: 1 1 auto !important;
     min-height: 0 !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     overflow-x: hidden !important;
-    padding-right: 6px !important;
+    padding-right: 2px !important;
   }
 
   /* Right column: keep Step 4 pinned to bottom for bottom alignment */
