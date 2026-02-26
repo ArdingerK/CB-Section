@@ -881,7 +881,6 @@
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
 }
 .pc-sd__canvas-container,
 .pc-sd__canvas-scroll-area{
@@ -1415,7 +1414,6 @@ width: var(--boardWpx);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
   padding-bottom: 140px;
 }
 
@@ -1740,7 +1738,6 @@ margin-bottom: 6px;
     height: auto !important;
     max-height: calc(100vh - 120px) !important;
     overflow: auto !important;
-    align-items: flex-start !important;
     padding-bottom: 24px !important;
   }
 
@@ -1962,7 +1959,6 @@ margin-bottom: 6px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
   padding-bottom: 140px;
 }
 
@@ -2723,14 +2719,12 @@ font-weight: bold;
 
 /* Keep the full board visible above Step 4, including tall/zoomed porch boards. */
 .pc-sd__canvas-scroll-area{
-  align-items: flex-start !important;
   padding-bottom: calc(var(--pc-bottom-bar-clearance, 220px) + env(safe-area-inset-bottom, 0px)) !important;
   scroll-padding-bottom: calc(var(--pc-bottom-bar-clearance, 220px) + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 @media (max-width: 989px){
   .pc-sd__canvas-scroll-area{
-    align-items: flex-start !important;
   }
 }
 
@@ -3200,36 +3194,22 @@ font-weight: bold;
   }
 }
 
-/* Canvas spacing + bottom decorative fade */
+/* Canvas spacing */
 .pc-sd__canvas-scroll-area {
-  padding-top: 24px !important;
-  padding-bottom: 120px !important;
-  scroll-padding-top: 24px !important;
-  scroll-padding-bottom: 120px !important;
-  align-items: flex-start !important;
-}
-
-.pc-sd__canvas-container {
-  position: relative;
-}
-
-.pc-sd__canvas-container::after {
-  content: '';
-  display: block;
-  flex: 0 0 auto;
-  height: 32px;
-  background: linear-gradient(to bottom, transparent, #d6ebee);
-  pointer-events: none;
-  margin-top: -32px;
-  position: relative;
-  z-index: 5;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 40px 12px !important;
+  min-height: 400px !important;
+  overflow: auto !important;
+  box-sizing: border-box !important;
 }
 
 @media (min-width: 990px) {
   .pc-sd__canvas-scroll-area {
-    justify-content: center !important;
-    align-items: flex-start !important;
-    min-height: 300px !important;
+    align-items: center !important;
+    padding: 40px 12px 120px 12px !important;
+    min-height: 500px !important;
   }
 }
 
