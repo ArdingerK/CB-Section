@@ -930,10 +930,11 @@ width: var(--boardWpx);
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  width:min(420px,78%);
-  padding:14px 18px;
-  border-radius:999px;
-  background:rgba(255,255,255,.90);
+  width:fit-content;
+  max-width:min(420px,78%);
+  padding:5px;
+  border-radius:8px;
+  background:#fff;
   border:1px solid var(--pc-border);
   box-shadow:0 14px 40px rgba(0,0,0,.18);
   backdrop-filter:blur(8px);
@@ -941,13 +942,11 @@ width: var(--boardWpx);
   font-weight:900;
   font-size:18px;
   line-height:1.1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:block;
   text-align:center;
   pointer-events:none;
   z-index:25;
-  white-space:nowrap;
+  white-space:normal;
 }
 
 /* drawers: base (desktop turns them “always open”) */
@@ -1884,19 +1883,18 @@ margin-bottom: 6px;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
 
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: inline-block !important;
 
     max-width: min(92%, 520px) !important;
-    padding: 14px 22px !important;
+    width: fit-content !important;
+    padding: 5px !important;
 
     text-align: center !important;
     white-space: normal !important;
     overflow: visible !important;
     line-height: 1.2 !important;
 
-    border-radius: 999px !important;
+    border-radius: 8px !important;
     z-index: 70 !important;
   }
   .pc-sd__hint *{
