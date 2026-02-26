@@ -2994,6 +2994,93 @@ font-weight: bold;
   }
 }
 
+
+/* Desktop fix: Step 2 shows two rows with scroll, Step 3 scrolls independently,
+   and Step 3 bottom aligns with Step 4 bottom. */
+@media (min-width: 990px){
+  .pc-sd__layout{
+    align-items: stretch !important;
+  }
+
+  .pc-sd__sidebar,
+  .pc-sd__rightcol{
+    max-height: calc(100vh - 220px) !important;
+    min-height: 0 !important;
+  }
+
+  .pc-sd__sidebar{
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding-right: 0 !important;
+  }
+
+  /* Step 2 remains compact and independently scrollable in palette only */
+  .pc-sd__drawer[data-drawer="stencils"]{
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__design{
+    overflow: visible !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette{
+    min-height: 0 !important;
+    max-height: 165px !important; /* ~2 visible rows */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Step 3 takes remaining sidebar height and owns its own scroll */
+  .pc-sd__drawer[data-drawer="tools"]{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__drawer-panel,
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__stepcard--3{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__stepcard--3{
+    overflow: hidden !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"] .pc-sd__sidebar-bottom{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-right: 6px !important;
+  }
+
+  /* Right column: keep Step 4 pinned to bottom for bottom alignment */
+  .pc-sd__rightcol{
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .pc-sd__canvas-container{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+
+  .pc-sd__rightcol > .pc-sd__bottombar{
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+  }
+}
+
 </style>
 
 <script>
