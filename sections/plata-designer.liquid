@@ -2728,6 +2728,22 @@ font-weight: bold;
   display: none !important;
 }
 
+/* Ensure sticky Step 4 bar never hides board content at any zoom level */
+.pc-sd{
+  --pc-bottom-bar-clearance: 220px;
+}
+
+.pc-sd__canvas-scroll-area{
+  padding-bottom: calc(var(--pc-bottom-bar-clearance) + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(var(--pc-bottom-bar-clearance) + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 989px){
+  .pc-sd{
+    --pc-bottom-bar-clearance: 170px;
+  }
+}
+
 @media (min-width: 990px){
   .pc-sd__canvas-scroll-area{
     position: relative !important;
