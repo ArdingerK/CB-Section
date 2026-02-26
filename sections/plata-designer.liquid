@@ -3101,6 +3101,26 @@ font-weight: bold;
   }
 }
 
+/* Requested spacing adjustments */
+@media (min-width: 990px){
+  /* (1) Reduce Step 1 bottom space before Step 2 */
+  .pc-sd__topsteps{
+    margin-bottom: 6px !important;
+  }
+}
+
+/* (2) Match Step 2 action button padding with stencil selector controls */
+.pc-sd__stepcard--2 .pc-sd__optional-actions > button{
+  height: auto !important;
+  padding: 12px 14px !important;
+}
+
+/* (3) Reduce autobanner margins + padding */
+.pc-sd__stepcard--2 .pc-sd__autobanner{
+  padding: 8px 10px !important;
+  margin: 8px 0 10px !important;
+}
+
 </style>
 
 <script>
