@@ -2889,11 +2889,11 @@ font-weight: bold;
   .pc-sd__quicktools--desktop.is-collapsed .pc-sd__qt-close{ display: none !important; }
 }
 
-/* Keep zoomed boards fully below the top controls bar. */
+/* Allow zoomed boards to reach the very top of the canvas area. */
 @media (min-width: 990px){
   .pc-sd__canvas-scroll-area{
-    padding-top: 24px !important;
-    scroll-padding-top: 24px !important;
+    padding-top: 0 !important;
+    scroll-padding-top: 0 !important;
   }
 
   .pc-sd__canvas{
