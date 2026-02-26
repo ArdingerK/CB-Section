@@ -4406,6 +4406,17 @@ function updateBoard({ isFlip = false } = {}) {
   // Auto-fit when board changes (or initial load), unless user manually set zoom.
   if (!isFlip && !userSetZoom) {
     fitBoardToViewport({ initialPorchFit: val === 'porch' });
+
+    // Run one delayed fit after layout settles so the tall porch board
+    // uses the final available viewport height (prevents initial clipping
+    // behind Step 4 when desktop flex sizing finishes).
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!userSetZoom) {
+          fitBoardToViewport({ initialPorchFit: val === 'porch' });
+        }
+      });
+    });
   }
 
   // Bind resize/orientation once
