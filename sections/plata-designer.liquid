@@ -867,6 +867,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding-top: 24px;
+  box-sizing: border-box;
 }
 
 .pc-sd__canvas-scroll-area{
@@ -879,7 +881,7 @@
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 .pc-sd__canvas-container,
 .pc-sd__canvas-scroll-area{
@@ -1960,7 +1962,7 @@ margin-bottom: 6px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding-bottom: 140px;
 }
 
@@ -2890,8 +2892,8 @@ font-weight: bold;
 /* Keep zoomed boards fully below the top controls bar. */
 @media (min-width: 990px){
   .pc-sd__canvas-scroll-area{
-    padding-top: 20px !important;
-    scroll-padding-top: 20px !important;
+    padding-top: 24px !important;
+    scroll-padding-top: 24px !important;
   }
 
   .pc-sd__canvas{
