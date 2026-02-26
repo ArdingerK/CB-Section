@@ -611,9 +611,8 @@
   margin-top: 32px; 
 
   flex: 0 0 auto;
-  margin-top: 16px;              /* optional spacing */
-  position: sticky;
-  bottom: 0;
+  margin-top: 16px;
+  position: relative;
   z-index: 10;
 }
 .pc-sd__bottombar::after{
@@ -1712,44 +1711,31 @@ margin-bottom: 6px;
     gap: 2px 24px !important;
     align-items: bottom !important;
   }
-  /* Make the whole designer fit the viewport */
-.pc-sd__layout {
-  height: calc(100vh - 120px); /* adjust 120px to whatever your header/spacing is */
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 420px 1fr; /* left steps / right canvas */
-  gap: 24px;
-}
+  /* Keep desktop layout content-driven (no forced vertical stretch) */
+  .pc-sd__layout {
+    height: auto !important;
+    overflow: visible !important;
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 12px !important;
+  }
 
-/* Left column becomes a vertical flex stack */
-.pc-sd__left {
-  min-height: 0;              /* IMPORTANT: allows inner scrolling */
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+  /* Bottom bar should sit directly after canvas content, not viewport bottom */
+  .pc-sd__bottombar{
+    position: relative !important;
+    bottom: auto !important;
+    margin-top: 16px !important;
+    margin-bottom: 28px !important;
+  }
 
-/* Step 2 is the one that scrolls */
-.pc-sd__step2 {
-  flex: 1;                    /* take remaining height */
-  min-height: 0;              /* IMPORTANT */
-  overflow: auto;
-}
-
-/* Step 3 stays visible and bottom bar aligns naturally */
-.pc-sd__step3 {
-  flex: 0 0 auto;
-}
-
-/* If your bottom bar is sticky/fixed, keep it above the canvas */
-.pc-sd__bottombar{
-  position: sticky; /* or fixed, whichever you use */
-  bottom: 0;
-  z-index: 50;
-}
-.pc-sd__canvas-scroll-area {
-  padding-bottom: 140px; /* fallback only — JS will override */
-}
+  /* Canvas remains independently scrollable for tall boards */
+  .pc-sd__canvas-scroll-area {
+    height: auto !important;
+    max-height: calc(100vh - 120px) !important;
+    overflow: auto !important;
+    align-items: flex-start !important;
+    padding-bottom: 24px !important;
+  }
   
 }
 
