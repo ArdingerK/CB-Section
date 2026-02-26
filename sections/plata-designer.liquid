@@ -33,7 +33,7 @@
 
     <div class="pc-sd__drawer-panel">
 
-      <div class="pc-sd__stepcard pc-sd__stepcard--1">
+      <div class="pc-sd__stepcard pc-sd__stepcard--1 pc-sd__step1">
 
         <div class="pc-sd__stephead pc-sd__stephead--sr">
           <span class="pc-sd__stepnum">1</span>
@@ -3131,6 +3131,42 @@ font-weight: bold;
    - keep Step 3 and Step 4 bottom-aligned/adjacent
    - expose Step 3 outline controls without needing Step 3 scroll */
 @media (min-width: 990px){
+  .pc-sd__step1{
+    position: relative;
+    overflow: visible !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .pc-sd__step1::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    height: 18px;
+    pointer-events: none;
+    border: 0 !important;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 120, 130, 0.08),
+      rgba(0, 120, 130, 0.04),
+      transparent
+    );
+  }
+
+  .pc-sd__topsteps,
+  .pc-sd__layout,
+  .pc-sd__canvas-container,
+  .pc-sd__canvas-scroll-area,
+  .pc-sd__canvas-wrapper,
+  .pc-sd__canvas-wrap,
+  .pc-sd__canvas{
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: 0 !important;
+  }
+
   .pc-sd__layout{
     align-items: stretch !important;
   }
