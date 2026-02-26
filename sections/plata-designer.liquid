@@ -4306,6 +4306,7 @@ function updateBoard({ isFlip = false } = {}) {
       updateStencilFiltering();
     }
     updateHintVisibility();
+    positionHintOverBoard();
   }, 50);
 }
 
@@ -4548,8 +4549,11 @@ function positionHintOverBoard() {
   const hint = root.querySelector('.pc-sd__hint');
   const canvas = root.querySelector('.pc-sd__canvas');
   if (!hint || !canvas) return;
+  const wrap = canvas.closest('.pc-sd__canvas-wrap');
+  if (!wrap) return;
+
   updateHintVisibility();
-if (hint.style.display === 'none') return;
+  if (hint.style.display === 'none') return;
 
   // If something is already on the board, never show the hint again
   if (root.querySelector('.pc-sd__placed')) {
@@ -4557,14 +4561,16 @@ if (hint.style.display === 'none') return;
     return;
   }
 
-  const wrap = canvas.closest('.pc-sd__canvas-wrap');
-  if (!wrap) return;
-
   hint.style.display = '';
 
   hint.style.position = 'absolute';
-  hint.style.left = '50%';
-  hint.style.top = '50%';
+  const canvasRect = canvas.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  const left = (canvasRect.left - wrapRect.left) + (canvasRect.width / 2);
+  const top = (canvasRect.top - wrapRect.top) + (canvasRect.height / 2);
+
+  hint.style.left = `${left}px`;
+  hint.style.top = `${top}px`;
   hint.style.transform = 'translate(-50%, -50%)';
   hint.style.zIndex = '50';
   hint.style.pointerEvents = 'none';
@@ -5303,6 +5309,8 @@ function setZoom(z, { fromUser = false } = {}) {
     const barH = bar.getBoundingClientRect().height || 100;
     scrollArea.style.paddingBottom = (barH + 32) + 'px';
   }
+
+  positionHintOverBoard();
 }
 
 // Wire handlers ONCE
