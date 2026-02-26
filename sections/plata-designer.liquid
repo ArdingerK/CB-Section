@@ -4562,15 +4562,9 @@ if (hint.style.display === 'none') return;
 
   hint.style.display = '';
 
-  const canvasRect = canvas.getBoundingClientRect();
-  const wrapRect = wrap.getBoundingClientRect();
-
-  const cx = (canvasRect.left - wrapRect.left) + (canvasRect.width / 2);
-  const cy = (canvasRect.top - wrapRect.top) + (canvasRect.height / 2);
-
   hint.style.position = 'absolute';
-  hint.style.left = cx + 'px';
-  hint.style.top = cy + 'px';
+  hint.style.left = '50%';
+  hint.style.top = '50%';
   hint.style.transform = 'translate(-50%, -50%)';
   hint.style.zIndex = '50';
   hint.style.pointerEvents = 'none';
