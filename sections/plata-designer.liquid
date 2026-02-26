@@ -3200,6 +3200,48 @@ font-weight: bold;
   }
 }
 
+/* Canvas spacing + edge fades: keep board clear of Step 4 and improve scroll affordance. */
+.pc-sd{
+  --pc-bottom-bar-clearance: 260px;
+}
+
+@media (min-width: 990px){
+  .pc-sd{
+    --pc-bottom-bar-clearance: 320px;
+  }
+}
+
+.pc-sd__canvas-container{
+  position: relative;
+}
+
+.pc-sd__canvas-scroll-area{
+  padding-bottom: calc(var(--pc-bottom-bar-clearance) + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(var(--pc-bottom-bar-clearance) + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.pc-sd__canvas-container::before,
+.pc-sd__canvas-container::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.pc-sd__canvas-container::before{
+  top: 0;
+  height: 48px;
+  background: linear-gradient(to bottom, #d6ebee 0%, rgba(214, 235, 238, 0) 100%);
+}
+
+.pc-sd__canvas-container::after{
+  bottom: 0;
+  height: 64px;
+  background: linear-gradient(to bottom, rgba(214, 235, 238, 0) 0%, #d6ebee 100%);
+}
+
 </style>
 
 <script>
