@@ -2995,7 +2995,7 @@ font-weight: bold;
 }
 
 
-/* Desktop fix: Step 2 shows two rows with scroll, Step 3 scrolls independently,
+/* Desktop fix: Step 2 shows at least two stencil rows before scroll, Step 3 scrolls independently,
    and Step 3 bottom aligns with Step 4 bottom. */
 @media (min-width: 990px){
   .pc-sd__layout{
@@ -3030,7 +3030,7 @@ font-weight: bold;
 
   .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette{
     min-height: 0 !important;
-    max-height: 120px !important; /* keep Step 2 compact to free room for Step 3 */
+    max-height: 170px !important; /* keeps Step 2 compact while showing ~2 rows before scrolling */
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
