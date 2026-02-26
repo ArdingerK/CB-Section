@@ -308,31 +308,6 @@
       </div><!-- /.pc-sd__drawer-panel -->
     </div><!-- /.pc-sd__drawer (tools) -->
 
-<!-- STEP 4 -->
-<div class="pc-sd__bottombar" role="region" aria-label="Save or add to cart">
-  <div class="pc-sd__bottombar-text">
-    <div class="pc-sd__step4head">
-      <span class="pc-sd__stepnum pc-sd__stepnum--inline">4</span>
-      <span class="pc-sd__love pc-sd__love--hand">Love how it turned out?</span>
-    </div>
-
-    <div class="pc-sd__step4sub">
-      Save <strong>20%</strong> on stencil packs
-      <span class="pc-sd__dot">•</span> buy <strong>2+</strong> packs
-      <span class="pc-sd__dot">•</span> or bundle with a chalkboard
-    </div>
-  </div>
-
-  <div class="pc-sd__bottombar-actions">
-    <button type="button" class="pc-sd__btn pc-sd__btn--ghost" data-export-image>
-      Save as PNG
-    </button>
-    <button type="button" class="pc-sd__btn pc-sd__btn--primary" data-add-to-cart-design>
-      Add Design to Cart
-    </button>
-  </div>
-</div>
-
   </div><!-- /.pc-sd__sidebar -->
 
   <!-- RIGHT: Canvas goes here (not included in your snippet) -->
@@ -395,6 +370,31 @@
 
     </div><!-- /.pc-sd__canvas-scroll-area -->
   </div><!-- /.pc-sd__canvas-container -->
+
+  <!-- STEP 4 -->
+  <div class="pc-sd__bottombar" role="region" aria-label="Save or add to cart">
+    <div class="pc-sd__bottombar-text">
+      <div class="pc-sd__step4head">
+        <span class="pc-sd__stepnum pc-sd__stepnum--inline">4</span>
+        <span class="pc-sd__love pc-sd__love--hand">Love how it turned out?</span>
+      </div>
+
+      <div class="pc-sd__step4sub">
+        Save <strong>20%</strong> on stencil packs
+        <span class="pc-sd__dot">•</span> buy <strong>2+</strong> packs
+        <span class="pc-sd__dot">•</span> or bundle with a chalkboard
+      </div>
+    </div>
+
+    <div class="pc-sd__bottombar-actions">
+      <button type="button" class="pc-sd__btn pc-sd__btn--ghost" data-export-image>
+        Save as PNG
+      </button>
+      <button type="button" class="pc-sd__btn pc-sd__btn--primary" data-add-to-cart-design>
+        Add Design to Cart
+      </button>
+    </div>
+  </div>
 </div><!-- /.pc-sd__rightcol -->
 
 </div><!-- /.pc-sd__layout -->
@@ -2913,6 +2913,67 @@ font-weight: bold;
     margin-bottom: 0 !important;
   }
 }
+
+
+/* Desktop layout alignment update: step 1 full width, step 4 under canvas, fixed-height section. */
+@media (min-width: 990px){
+  .pc-sd{
+    height: calc(100vh - 24px) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__topsteps{
+    flex: 0 0 auto !important;
+  }
+
+  .pc-sd__layout{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+  }
+
+  .pc-sd__sidebar,
+  .pc-sd__rightcol{
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__sidebar{
+    overflow: hidden !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"]{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+
+  .pc-sd__drawer[data-drawer="tools"]{
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+  }
+
+  .pc-sd__canvas-container{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+
+  .pc-sd__canvas-scroll-area{
+    height: 100% !important;
+    max-height: none !important;
+    overflow: auto !important;
+  }
+
+  .pc-sd__rightcol > .pc-sd__bottombar{
+    flex: 0 0 auto !important;
+    width: min(620px, 100%) !important;
+    margin: 12px auto 0 !important;
+  }
+}
+
 </style>
 
 <script>
