@@ -893,8 +893,8 @@
 .pc-sd__canvas{
 width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top center;
-  transform: scale(var(--zoom, 1));
+  transform-origin: center center;
+  transform: rotate(var(--board-rotation, 0deg)) scale(var(--zoom, 1));
   overflow: hidden;
   margin: 0 auto;
   display: block;
@@ -910,20 +910,6 @@ width: var(--boardWpx);
   pointer-events:none;
   display:block;
   z-index:1;
-}
-.pc-sd__canvas.is-flipped .pc-sd__board-img-el{
-  width:var(--boardHpx);
-  height:var(--boardWpx);
-  transform:translate(-50%,-50%) rotate(90deg);
-}
-.pc-sd__canvas.is-wreath-rotated{
-  transform-origin:center center;
-}
-.pc-sd__canvas.is-wreath-rotated .pc-sd__board-img-el{
-  width:var(--boardHpx);
-  height:var(--boardWpx);
-  transform-origin:center center;
-  transform:translate(-50%,-50%) rotate(90deg);
 }
 .pc-sd__stage{ position:absolute; inset:0; z-index:5; }
 
@@ -1920,8 +1906,8 @@ margin-bottom: 6px;
  .pc-sd__canvas{
    width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top center;
-  transform: scale(var(--zoom, 1));
+  transform-origin: center center;
+  transform: rotate(var(--board-rotation, 0deg)) scale(var(--zoom, 1));
   margin: 0 auto;
   display: block;
   overflow: hidden;
@@ -4275,8 +4261,8 @@ function updateBoard({ isFlip = false } = {}) {
     canvasEl.style.setProperty('--boardHpx', `${h}px`);
     root.style.setProperty('--boardWpx', `${w}px`);
     root.style.setProperty('--boardHpx', `${h}px`);
-    canvasEl.classList.toggle('is-flipped', flipped && !isWreath);
-    canvasEl.classList.toggle('is-wreath-rotated', flipped && isWreath);
+    const visualRotation = (flipped && !isWreath) ? '90deg' : '0deg';
+    canvasEl.style.setProperty('--board-rotation', visualRotation);
   }
 
   // Background image
