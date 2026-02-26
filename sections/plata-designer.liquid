@@ -2712,10 +2712,24 @@ font-weight: bold;
 }
 .pc-sd__item[data-pack*="gnome"]{
   --pack-bg: rgb(198, 255, 243);
+}
 
 
 .pc-sd__item[data-pack*="sports"]{
   --pack-bg: rgb(210, 235, 255);
+}
+
+/* Keep the full board visible above Step 4, including tall/zoomed porch boards. */
+.pc-sd__canvas-scroll-area{
+  align-items: flex-start !important;
+  padding-bottom: calc(var(--pc-bottom-bar-clearance, 220px) + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(var(--pc-bottom-bar-clearance, 220px) + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 989px){
+  .pc-sd__canvas-scroll-area{
+    align-items: flex-start !important;
+  }
 }
 
 .pc-sd__canvas-scroll-area {
