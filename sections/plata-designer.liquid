@@ -1371,11 +1371,13 @@ width: var(--boardWpx);
   gap: 8px;
 }
 
-  /* Step 4 pinned under canvas (bottom of rightcol) */
+/* Step 4 pinned under canvas on desktop only */
+@media (min-width: 990px){
   .pc-sd__bottombar{
     margin-top:auto;
     margin-bottom:32px;
   }
+}
 
   /* =========================================================
    DESKTOP OVERRIDES — CLEAN (replace your entire "new" block)
@@ -2206,6 +2208,17 @@ margin-bottom: 6px;
   /* Prevent bar covering content */
   #pc-sd-{{ section.id }}{
     padding-bottom: 140px;
+  }
+
+  /* Keep Step 4 attached directly under the canvas on mobile/tablet */
+  .pc-sd__rightcol > .pc-sd__bottombar{
+    margin-top: 12px !important;
+    margin-bottom: 0 !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
   }
   
 
