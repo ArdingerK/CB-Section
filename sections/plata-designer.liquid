@@ -5658,20 +5658,18 @@ function updateBoardVisibilityBorder() {
   const canvasEl = root.querySelector('.pc-sd__canvas');
   if (!area || !canvasEl) return;
 
-  const boardH = parseFloat(canvasEl.style.getPropertyValue('--boardHpx') || getComputedStyle(canvasEl).getPropertyValue('--boardHpx')) || 0;
-  const boardW = parseFloat(canvasEl.style.getPropertyValue('--boardWpx') || getComputedStyle(canvasEl).getPropertyValue('--boardWpx')) || 0;
-  const zoom = parseFloat(root.style.getPropertyValue('--zoom') || getComputedStyle(root).getPropertyValue('--zoom')) || 1;
+  // Use the actual rendered bounding rect of the canvas (already scaled by zoom via CSS transform)
+  const canvasRect = canvasEl.getBoundingClientRect();
+  const areaRect = area.getBoundingClientRect();
 
-  const scaledH = boardH * zoom;
-  const scaledW = boardW * zoom;
+  // Check if the full canvas is visible within the scroll area's viewport
+  const topVisible = canvasRect.top >= areaRect.top - 2;
+  const bottomVisible = canvasRect.bottom <= areaRect.bottom + 2;
+  const leftVisible = canvasRect.left >= areaRect.left - 2;
+  const rightVisible = canvasRect.right <= areaRect.right + 2;
 
-  const availH = area.clientHeight - 48;
-  const availW = area.clientWidth - 24;
-
-  const fits = scaledH <= availH && scaledW <= availW;
-  const notScrolled = area.scrollTop < 4 && area.scrollLeft < 4;
-
-  area.classList.toggle('board-fully-visible', fits && notScrolled);
+  const fullyVisible = topVisible && bottomVisible && leftVisible && rightVisible;
+  area.classList.toggle('board-fully-visible', fullyVisible);
 }
 
 const scrollArea = root.querySelector('.pc-sd__canvas-scroll-area');
