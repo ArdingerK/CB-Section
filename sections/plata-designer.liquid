@@ -3311,6 +3311,49 @@ font-weight: bold;
 }
 
 @media (max-width: 989px) {
+  /* Square corners on all drawer cards — match Step 2 look */
+  .pc-sd__drawer {
+    border-radius: 8px !important;
+    border: 1px solid rgba(0,0,0,.10) !important;
+    background: #fff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06) !important;
+    overflow: hidden !important;
+    margin-bottom: 8px !important;
+  }
+
+  .pc-sd__drawer-toggle {
+    border-radius: 0 !important;
+    background: #fff !important;
+    padding: 14px 16px !important;
+  }
+
+  .pc-sd__drawer-panel {
+    border-radius: 0 !important;
+  }
+
+  /* Specifically kill any per-step border-radius overrides */
+  .pc-sd__drawer--step1,
+  .pc-sd__drawer[data-drawer="board"],
+  .pc-sd__drawer[data-drawer="stencils"],
+  .pc-sd__drawer[data-drawer="tools"] {
+    border-radius: 8px !important;
+  }
+
+  /* Kill the colored left borders some steps have */
+  .pc-sd__drawer--step1 > .pc-sd__drawer-toggle,
+  .pc-sd__drawer[data-drawer="board"] > .pc-sd__drawer-toggle,
+  .pc-sd__drawer[data-drawer="stencils"] > .pc-sd__drawer-toggle,
+  .pc-sd__drawer[data-drawer="tools"] > .pc-sd__drawer-toggle {
+    border-left: none !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+  }
+
+  .pc-sd__drawer[data-open="true"] > .pc-sd__drawer-toggle {
+    border-bottom: 1px solid rgba(0,0,0,.08) !important;
+  }
+
   .pc-sd__stepcard--3 .pc-sd__step3-head {
     display: none !important;
   }
