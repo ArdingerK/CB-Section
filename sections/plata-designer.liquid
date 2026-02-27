@@ -1798,12 +1798,29 @@ margin-bottom: 6px;
     overflow: visible !important;
   }
 
+  /* Force sidebar and rightcol to full width on mobile */
+  .pc-sd__sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+  }
+
+  .pc-sd__rightcol {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+  }
+
   /* 2) Drawer container */
   .pc-sd__drawer{
     border: 2px solid rgba(0,0,0,.14) !important;
     border-radius: 16px !important;
     background: #fff !important;
     overflow: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .pc-sd__drawer-toggle{
@@ -1815,6 +1832,16 @@ margin-bottom: 6px;
     align-items:center;
     gap:12px;
     padding:14px 14px;
+    width: 100% !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+
+  .pc-sd__drawer-sub {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 160px !important;
   }
 
   /* Divider only when open */
