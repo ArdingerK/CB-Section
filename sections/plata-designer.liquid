@@ -3120,6 +3120,7 @@ font-weight: bold;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
+  transition: box-shadow 0.25s ease;
   padding: 32px 12px 160px 12px !important;
   padding-bottom: 140px !important;
   overflow: auto !important;
@@ -3129,16 +3130,11 @@ font-weight: bold;
   width: 100% !important;
 }
 
-.pc-sd__canvas-wrap {
-  border-radius: 4px;
-  transition: box-shadow 0.3s ease;
+.pc-sd__canvas-scroll-area.board-fully-visible {
+  box-shadow: inset 0 0 0 3px #6bbfc2, inset 0 0 0 6px rgba(107,191,194,0.18);
 }
 
-.pc-sd__canvas-wrap.board-fully-visible {
-  box-shadow: 0 0 0 3px #6bbfc2, 0 0 0 6px rgba(107, 191, 194, 0.25);
-}
-
-.pc-sd__canvas-wrap:not(.board-fully-visible) {
+.pc-sd__canvas-scroll-area:not(.board-fully-visible) {
   box-shadow: none;
 }
 
@@ -5660,14 +5656,13 @@ function setZoom(z, { fromUser = false } = {}) {
 }
 
 function updateBoardVisibilityBorder() {
-  const wrap = root.querySelector('.pc-sd__canvas-wrap');
   const area = root.querySelector('.pc-sd__canvas-scroll-area');
   const canvasEl = root.querySelector('.pc-sd__canvas');
-  if (!wrap || !area || !canvasEl) return;
+  if (!area || !canvasEl) return;
 
-  const boardH = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardHpx')) || 0;
-  const boardW = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardWpx')) || 0;
-  const zoom = parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
+  const boardH = parseFloat(canvasEl.style.getPropertyValue('--boardHpx') || getComputedStyle(canvasEl).getPropertyValue('--boardHpx')) || 0;
+  const boardW = parseFloat(canvasEl.style.getPropertyValue('--boardWpx') || getComputedStyle(canvasEl).getPropertyValue('--boardWpx')) || 0;
+  const zoom = parseFloat(root.style.getPropertyValue('--zoom') || getComputedStyle(root).getPropertyValue('--zoom')) || 1;
 
   const scaledH = boardH * zoom;
   const scaledW = boardW * zoom;
@@ -5681,8 +5676,15 @@ function updateBoardVisibilityBorder() {
   const availH = area.clientHeight - padTop - padBottom;
   const availW = area.clientWidth - padLeft - padRight;
 
-  const fullyVisible = scaledH <= availH + 4 && scaledW <= availW + 4;
-  wrap.classList.toggle('board-fully-visible', fullyVisible);
+  // Board is fully visible only when scaled size fits within the scroll area
+  const fullyVisible = scaledH <= availH + 2 && scaledW <= availW + 2;
+  area.classList.toggle('board-fully-visible', fullyVisible);
+}
+
+const scrollArea = root.querySelector('.pc-sd__canvas-scroll-area');
+if (scrollArea && !root.__pc_sd_scroll_border_bound) {
+  root.__pc_sd_scroll_border_bound = true;
+  scrollArea.addEventListener('scroll', updateBoardVisibilityBorder, { passive: true });
 }
 
 // Wire handlers ONCE
