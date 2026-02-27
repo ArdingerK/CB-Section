@@ -922,17 +922,23 @@
 }
 .pc-sd__canvas-wrap{
   position: relative !important;
-  display: inline-block !important;
+  display: block !important;
+  width: calc(var(--boardWpx, 0px) * var(--zoom, 1)) !important;
+  height: calc(var(--boardHpx, 0px) * var(--zoom, 1)) !important;
+  flex: 0 0 auto !important;
 }
 
 /* actual canvas board */
 .pc-sd__canvas{
-width: var(--boardWpx);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top center !important;
+  transform-origin: top left !important;
   transform: scale(var(--zoom, 1)) !important;
   overflow: hidden;
-  margin: 0 auto;
+  margin: 0;
   display: block;
 }
 .pc-sd__board-img-el{
@@ -1939,15 +1945,21 @@ margin-bottom: 6px;
 
 .pc-sd__canvas-wrap{
   position: relative !important;
-  display: inline-block !important;
+  display: block !important;
+  width: calc(var(--boardWpx, 0px) * var(--zoom, 1)) !important;
+  height: calc(var(--boardHpx, 0px) * var(--zoom, 1)) !important;
+  flex: 0 0 auto !important;
 }
 
  .pc-sd__canvas{
-   width: var(--boardWpx);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top center !important;
+  transform-origin: top left !important;
   transform: scale(var(--zoom, 1)) !important;
-  margin: 0 auto;
+  margin: 0;
   display: block;
   overflow: hidden;
 }
