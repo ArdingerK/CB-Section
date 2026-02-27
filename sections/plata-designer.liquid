@@ -3503,6 +3503,37 @@ font-weight: bold;
   }
 }
 
+
+@media (min-width: 990px) {
+  /* Force Step 2 drawer to shrink-wrap its content — no trailing space */
+  .pc-sd__drawer[data-drawer="stencils"] {
+    flex: 0 0 auto !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__drawer-panel,
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__stepcard--2,
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__sidebar-section,
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__design {
+    flex: 0 0 auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette {
+    padding: 10px 10px 0 10px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__grid {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Kill any bottom padding on the card itself */
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__stepcard {
+    padding-bottom: 0 !important;
+  }
+}
 </style>
 
 <script>
