@@ -236,8 +236,8 @@
                   </div>
 
                   <div class="pc-sd__button-bar">
-                    <button type="button" class="pc-sd__btn pc-sd__btn--small pc-sd__btn--ghost pc-sd__btn--full" data-rotate-left>Rotate ⟲</button>
-                    <button type="button" class="pc-sd__btn pc-sd__btn--small pc-sd__btn--ghost pc-sd__btn--full" data-rotate-right>Rotate ⟳</button>
+                    <button type="button" class="pc-sd__btn pc-sd__btn--small pc-sd__btn--ghost pc-sd__btn--full" data-rotate-left>⟲</button>
+                    <button type="button" class="pc-sd__btn pc-sd__btn--small pc-sd__btn--ghost pc-sd__btn--full" data-rotate-right>⟳</button>
                   </div>
 
                   <button type="button" class="pc-sd__btn pc-sd__btn--small pc-sd__btn--danger pc-sd__btn--full" data-delete-selected>
@@ -3252,20 +3252,47 @@ font-weight: bold;
 
   .pc-sd__stepcard--3 .pc-sd__tools-colors {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
+    grid-template-columns: 140px 1fr !important;
+    gap: 12px !important;
     align-items: start !important;
+    overflow: visible !important;
   }
 
   .pc-sd__stepcard--3 .pc-sd__swatches {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 6px !important;
+    justify-items: center !important;
   }
 
   .pc-sd__stepcard--3 .pc-sd__swatch {
-    width: 28px !important;
-    height: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__button-bar {
+    display: flex !important;
+    gap: 6px !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__button-bar .pc-sd__btn {
+    flex: 1 !important;
+    padding: 10px 4px !important;
+    font-size: 18px !important;
+    text-align: center !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__btn-strip {
+    display: flex !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .pc-sd__stepcard--3 .pc-sd__tool-btn {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    font-size: 13px !important;
+    padding: 4px !important;
   }
 
   .pc-sd__stepcard--3 .pc-sd__btn {
