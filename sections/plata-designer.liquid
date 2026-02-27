@@ -932,10 +932,11 @@
 .pc-sd__canvas{
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  translate: -50% 0;
   width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top left !important;
+  transform-origin: top center !important;
   transform: scale(var(--zoom, 1)) !important;
   overflow: hidden;
   margin: 0;
@@ -1954,10 +1955,11 @@ margin-bottom: 6px;
  .pc-sd__canvas{
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  translate: -50% 0;
   width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: top left !important;
+  transform-origin: top center !important;
   transform: scale(var(--zoom, 1)) !important;
   margin: 0;
   display: block;
@@ -4135,17 +4137,14 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
   const isZoomingOut = nextZoom < prevZoomValue;
 
   requestAnimationFrame(() => {
-    // Initial auto-fit and user zoom-out should reveal the board top.
+    // Scroll to top when zooming out or board fits
     if (!fromUser || isZoomingOut || scaledBoardH <= visibleHeight + 1) {
       area.scrollTop = 0;
     }
 
-    const maxLeft = Math.max(0, area.scrollWidth - area.clientWidth);
-
-    // Keep the board centered horizontally at every zoom level.
-    // Use the actual scrollable width rather than scaled board estimates,
-    // because CSS/layout can introduce extra width that should still be centered.
-    area.scrollLeft = maxLeft > 0 ? maxLeft / 2 : 0;
+    // Center horizontally: scroll to the midpoint of the overflow
+    const maxScrollLeft = Math.max(0, area.scrollWidth - area.clientWidth);
+    area.scrollLeft = maxScrollLeft / 2;
   });
 }
 
