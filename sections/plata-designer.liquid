@@ -877,21 +877,22 @@
 
 /* board wrapper */
 .pc-sd__canvas-wrapper{
-  position: relative;
-  margin: 0 auto;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  flex-shrink: 0 !important;
+  width: 100% !important;
 }
-.pc-sd__canvas-wrap{ position:relative !important; }
+.pc-sd__canvas-wrap{
+  position: relative !important;
+  display: inline-block !important;
+}
 
 /* actual canvas board */
 .pc-sd__canvas{
 width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: center center;
-  transform: rotate(var(--board-rotation, 0deg)) scale(var(--zoom, 1));
+  transform-origin: top center !important;
+  transform: scale(var(--zoom, 1)) !important;
   overflow: hidden;
   margin: 0 auto;
   display: block;
@@ -907,6 +908,11 @@ width: var(--boardWpx);
   pointer-events:none;
   display:block;
   z-index:1;
+}
+.pc-sd__canvas[data-flipped="true"] .pc-sd__board-img-el {
+  transform: translate(-50%, -50%) rotate(90deg) !important;
+  width: var(--boardHpx) !important;
+  height: var(--boardWpx) !important;
 }
 .pc-sd__stage{ position:absolute; inset:0; z-index:5; }
 
@@ -1033,10 +1039,17 @@ width: var(--boardWpx);
 .pc-sd__drawer[data-drawer="tools"] .pc-sd__stepcard--3{
   border: 0 !important;
 }
-.pc-sd__canvas-wrapper,
-  .pc-sd__canvas-wrap{
-    position: relative !important;
-  }
+.pc-sd__canvas-wrapper{
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.pc-sd__canvas-wrap{
+  position: relative !important;
+  display: inline-block !important;
+}
   /* ---------------------------
    STEP 4 (Cozy)
 --------------------------- */
@@ -1322,16 +1335,15 @@ width: var(--boardWpx);
 }
 
 .pc-sd__canvas-wrapper{
-  position: relative;
-  margin: 0 auto;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  flex-shrink: 0 !important;
+  width: 100% !important;
 }
 
 .pc-sd__canvas-wrap{
   position: relative !important;
+  display: inline-block !important;
 }
 
 .pc-sd__canvas{
@@ -1387,9 +1399,7 @@ width: var(--boardWpx);
 /* A) Canvas: ensure ONLY the canvas scroll-area scrolls */
 /* Let the hint spill outside the board area */
 .pc-sd__rightcol,
-.pc-sd__canvas-container,
-.pc-sd__canvas-wrapper,
-.pc-sd__canvas-wrap{
+.pc-sd__canvas-container{
   overflow: visible !important;
 }
 
@@ -1883,23 +1893,22 @@ margin-bottom: 6px;
   /* 7) Canvas centering (keep your win) */
   
  .pc-sd__canvas-wrapper{
-  position: relative;
-  margin: 0 auto;
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  flex-shrink: 0 !important;
+  width: 100% !important;
 }
 
 .pc-sd__canvas-wrap{
   position: relative !important;
+  display: inline-block !important;
 }
 
  .pc-sd__canvas{
    width: var(--boardWpx);
   height: var(--boardHpx);
-  transform-origin: center center;
-  transform: rotate(var(--board-rotation, 0deg)) scale(var(--zoom, 1));
+  transform-origin: top center !important;
+  transform: scale(var(--zoom, 1)) !important;
   margin: 0 auto;
   display: block;
   overflow: hidden;
@@ -3073,8 +3082,6 @@ font-weight: bold;
   .pc-sd__topsteps,
   .pc-sd__layout,
   .pc-sd__canvas-container,
-  .pc-sd__canvas-wrapper,
-  .pc-sd__canvas-wrap,
   .pc-sd__canvas{
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
@@ -4564,24 +4571,16 @@ function updateBoard({ isFlip = false } = {}) {
   // Set canvas size ONLY
   const canvasEl = root.querySelector('.pc-sd__canvas');
   if (canvasEl) {
-    canvasEl.style.setProperty('--boardWpx', `${w}px`);
-    canvasEl.style.setProperty('--boardHpx', `${h}px`);
+    if (flipped && !isWreath) {
+      canvasEl.style.setProperty('--boardWpx', `${h}px`);
+      canvasEl.style.setProperty('--boardHpx', `${w}px`);
+    } else {
+      canvasEl.style.setProperty('--boardWpx', `${w}px`);
+      canvasEl.style.setProperty('--boardHpx', `${h}px`);
+    }
+
     root.style.setProperty('--boardWpx', `${w}px`);
     root.style.setProperty('--boardHpx', `${h}px`);
-    const visualRotation = (flipped && !isWreath) ? '90deg' : '0deg';
-    canvasEl.style.setProperty('--board-rotation', visualRotation);
-
-    // Keep wrapper layout dimensions aligned with rotated visual footprint.
-    const canvasWrapper = root.querySelector('.pc-sd__canvas-wrapper');
-    if (canvasWrapper) {
-      if (flipped && !isWreath) {
-        canvasWrapper.style.width = `${h}px`;
-        canvasWrapper.style.height = `${w}px`;
-      } else {
-        canvasWrapper.style.width = `${w}px`;
-        canvasWrapper.style.height = `${h}px`;
-      }
-    }
   }
 
   // Background image
