@@ -4132,13 +4132,7 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
   const visibleHeight = Math.max(0, area.clientHeight - padY);
   const scaledBoardW = boardW * nextZoom;
   const scaledBoardH = boardH * nextZoom;
-  const prevScaledBoardW = boardW * prevZoomValue;
   const isZoomingOut = nextZoom < prevZoomValue;
-
-  const currentCenterX = area.scrollLeft + (area.clientWidth / 2);
-  const centerRatioX = prevScaledBoardW > 0
-    ? currentCenterX / prevScaledBoardW
-    : 0.5;
 
   requestAnimationFrame(() => {
     // Initial auto-fit and user zoom-out should reveal the board top.
@@ -4148,13 +4142,9 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
 
     const maxLeft = Math.max(0, area.scrollWidth - area.clientWidth);
 
-    // Keep user focus point while zooming. When not user-initiated (auto-fit / board
-    // switch), center the board horizontally within the viewport.
+    // Keep the board centered horizontally at every zoom level.
     if (maxLeft <= 0 || scaledBoardW <= visibleWidth + 1) {
       area.scrollLeft = 0;
-    } else if (fromUser) {
-      const target = (scaledBoardW * centerRatioX) - (area.clientWidth / 2);
-      area.scrollLeft = Math.max(0, Math.min(maxLeft, target));
     } else {
       area.scrollLeft = maxLeft / 2;
     }
