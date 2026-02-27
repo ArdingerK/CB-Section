@@ -3129,6 +3129,19 @@ font-weight: bold;
   width: 100% !important;
 }
 
+.pc-sd__canvas-wrap {
+  border-radius: 4px;
+  transition: box-shadow 0.3s ease;
+}
+
+.pc-sd__canvas-wrap.board-fully-visible {
+  box-shadow: 0 0 0 3px #6bbfc2, 0 0 0 6px rgba(107, 191, 194, 0.25);
+}
+
+.pc-sd__canvas-wrap:not(.board-fully-visible) {
+  box-shadow: none;
+}
+
 @media (min-width: 990px) {
   .pc-sd__canvas-scroll-area {
     padding: 32px 12px 160px 12px !important;
@@ -4621,10 +4634,15 @@ function updateBoard({ isFlip = false } = {}) {
     });
   }
 
+  requestAnimationFrame(updateBoardVisibilityBorder);
+
   // Bind resize/orientation once
   if (!root.__pc_sd_fit_bound) {
     root.__pc_sd_fit_bound = true;
-    window.addEventListener('resize', () => fitBoardToViewport(), { passive: true });
+    window.addEventListener('resize', () => {
+      fitBoardToViewport();
+      updateBoardVisibilityBorder();
+    }, { passive: true });
     window.addEventListener('orientationchange', () => fitBoardToViewport(), { passive: true });
   }
 
@@ -5638,6 +5656,33 @@ function setZoom(z, { fromUser = false } = {}) {
   adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser });
 
   positionHintOverBoard();
+  updateBoardVisibilityBorder();
+}
+
+function updateBoardVisibilityBorder() {
+  const wrap = root.querySelector('.pc-sd__canvas-wrap');
+  const area = root.querySelector('.pc-sd__canvas-scroll-area');
+  const canvasEl = root.querySelector('.pc-sd__canvas');
+  if (!wrap || !area || !canvasEl) return;
+
+  const boardH = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardHpx')) || 0;
+  const boardW = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--boardWpx')) || 0;
+  const zoom = parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
+
+  const scaledH = boardH * zoom;
+  const scaledW = boardW * zoom;
+
+  const cs = getComputedStyle(area);
+  const padTop = parseFloat(cs.paddingTop) || 0;
+  const padBottom = parseFloat(cs.paddingBottom) || 0;
+  const padLeft = parseFloat(cs.paddingLeft) || 0;
+  const padRight = parseFloat(cs.paddingRight) || 0;
+
+  const availH = area.clientHeight - padTop - padBottom;
+  const availW = area.clientWidth - padLeft - padRight;
+
+  const fullyVisible = scaledH <= availH + 4 && scaledW <= availW + 4;
+  wrap.classList.toggle('board-fully-visible', fullyVisible);
 }
 
 // Wire handlers ONCE
