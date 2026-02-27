@@ -3245,6 +3245,59 @@ font-weight: bold;
   flex-shrink: 0 !important;
 }
 
+@media (max-width: 989px) {
+  .pc-sd__zoomline--between {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    padding: 10px 16px !important;
+    width: 100% !important;
+  }
+
+  .pc-sd__zoomline--between .pc-sd__range {
+    flex: 1 1 auto !important;
+    max-width: 220px !important;
+  }
+
+  .pc-sd__canvas-scroll-area {
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  .pc-sd__quicktools--desktop {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    z-index: 100 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10) !important;
+  }
+
+  .pc-sd__qt-btn {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 18px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .pc-sd__qt-close,
+  .pc-sd__qt-tab {
+    display: none !important;
+  }
+}
+
 </style>
 
 <script>
