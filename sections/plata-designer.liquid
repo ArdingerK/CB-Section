@@ -879,8 +879,12 @@
 .pc-sd__canvas-wrapper{
   position: relative;
   margin: 0 auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
 }
-.pc-sd__canvas-wrap{ position:relative; }
+.pc-sd__canvas-wrap{ position:relative !important; }
 
 /* actual canvas board */
 .pc-sd__canvas{
@@ -1320,10 +1324,14 @@ width: var(--boardWpx);
 .pc-sd__canvas-wrapper{
   position: relative;
   margin: 0 auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
 }
 
 .pc-sd__canvas-wrap{
-  position: relative;
+  position: relative !important;
 }
 
 .pc-sd__canvas{
@@ -1877,10 +1885,14 @@ margin-bottom: 6px;
  .pc-sd__canvas-wrapper{
   position: relative;
   margin: 0 auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
 }
 
 .pc-sd__canvas-wrap{
-  position: relative;
+  position: relative !important;
 }
 
  .pc-sd__canvas{
@@ -4558,6 +4570,18 @@ function updateBoard({ isFlip = false } = {}) {
     root.style.setProperty('--boardHpx', `${h}px`);
     const visualRotation = (flipped && !isWreath) ? '90deg' : '0deg';
     canvasEl.style.setProperty('--board-rotation', visualRotation);
+
+    // Keep wrapper layout dimensions aligned with rotated visual footprint.
+    const canvasWrapper = root.querySelector('.pc-sd__canvas-wrapper');
+    if (canvasWrapper) {
+      if (flipped && !isWreath) {
+        canvasWrapper.style.width = `${h}px`;
+        canvasWrapper.style.height = `${w}px`;
+      } else {
+        canvasWrapper.style.width = `${w}px`;
+        canvasWrapper.style.height = `${h}px`;
+      }
+    }
   }
 
   // Background image
