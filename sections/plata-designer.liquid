@@ -1604,9 +1604,9 @@ margin-bottom: 6px;
   overflow:visible !important;
 }
 .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette{
-  flex:0 0 auto !important;
+  flex:1 1 auto !important;
   min-height:280px !important;  /* Shows ~3 rows of stencils */
-  max-height:420px !important;  /* Cap it so Step 3 is still visible */
+  max-height:none !important;
   overflow-y:auto !important;
   overflow-x:hidden !important;
   scrollbar-gutter:stable;
@@ -2955,20 +2955,41 @@ font-weight: bold;
     padding-right: 0 !important;
   }
 
-  /* Step 2 remains compact and independently scrollable in palette only */
+  /* Step 2 drawer: grow to fill remaining sidebar space */
   .pc-sd__drawer[data-drawer="stencils"]{
-    flex: 0 0 auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
     margin-bottom: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__drawer-panel {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pc-sd__drawer[data-drawer="stencils"] .pc-sd__stepcard--2 {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .pc-sd__drawer[data-drawer="stencils"] .pc-sd__design{
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
     overflow: visible !important;
   }
 
   .pc-sd__drawer[data-drawer="stencils"] .pc-sd__palette{
-    min-height: 0 !important;
-    max-height: 170px !important; /* keeps Step 2 compact while showing ~2 rows before scrolling */
+    flex: 1 1 auto !important;
+    min-height: 120px !important;
+    max-height: none !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
