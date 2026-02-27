@@ -3120,22 +3120,22 @@ font-weight: bold;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  transition: box-shadow 0.25s ease;
   overflow: auto !important;
   overscroll-behavior: contain !important;
   box-sizing: border-box !important;
   min-height: 0 !important;
   width: 100% !important;
-}
-
-.pc-sd__canvas-scroll-area.board-fully-visible {
-  padding: 24px 12px !important;
-  box-shadow: inset 0 0 0 3px #6bbfc2, inset 0 0 0 6px rgba(107,191,194,0.18);
-}
-
-.pc-sd__canvas-scroll-area:not(.board-fully-visible) {
   padding: 0 !important;
-  box-shadow: none;
+}
+
+/* Breathing room around board only when fully visible (zoomed out) */
+.pc-sd__canvas-scroll-area.board-fully-visible .pc-sd__canvas-wrapper {
+  margin: 24px 0 !important;
+}
+
+/* When zoomed/overflowing — no margin, board reaches edges */
+.pc-sd__canvas-scroll-area:not(.board-fully-visible) .pc-sd__canvas-wrapper {
+  margin: 0 !important;
 }
 
 @media (min-width: 990px) {
@@ -3147,7 +3147,7 @@ font-weight: bold;
 
 
 .pc-sd__rightcol > .pc-sd__bottombar {
-  margin-top: 24px !important;
+  margin-top: 16px !important;
   flex-shrink: 0 !important;
 }
 
@@ -5665,19 +5665,13 @@ function updateBoardVisibilityBorder() {
   const scaledH = boardH * zoom;
   const scaledW = boardW * zoom;
 
-  const cs = getComputedStyle(area);
-  const padTop = parseFloat(cs.paddingTop) || 0;
-  const padBottom = parseFloat(cs.paddingBottom) || 0;
-  const padLeft = parseFloat(cs.paddingLeft) || 0;
-  const padRight = parseFloat(cs.paddingRight) || 0;
+  const availH = area.clientHeight - 48;
+  const availW = area.clientWidth - 24;
 
-  const comfortableMargin = 40;
-  const availH = area.clientHeight - padTop - padBottom - comfortableMargin;
-  const availW = area.clientWidth - padLeft - padRight - comfortableMargin;
+  const fits = scaledH <= availH && scaledW <= availW;
+  const notScrolled = area.scrollTop < 4 && area.scrollLeft < 4;
 
-  // Board is fully visible only when scaled size is comfortably inside the area.
-  const fullyVisible = scaledH <= availH && scaledW <= availW;
-  area.classList.toggle('board-fully-visible', fullyVisible);
+  area.classList.toggle('board-fully-visible', fits && notScrolled);
 }
 
 const scrollArea = root.querySelector('.pc-sd__canvas-scroll-area');
