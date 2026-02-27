@@ -5655,20 +5655,13 @@ function setZoom(z, { fromUser = false } = {}) {
 
 function updateBoardVisibilityBorder() {
   const area = root.querySelector('.pc-sd__canvas-scroll-area');
-  const canvasEl = root.querySelector('.pc-sd__canvas');
-  if (!area || !canvasEl) return;
+  if (!area) return;
 
-  // Use the actual rendered bounding rect of the canvas (already scaled by zoom via CSS transform)
-  const canvasRect = canvasEl.getBoundingClientRect();
-  const areaRect = area.getBoundingClientRect();
+  // If the content overflows in either direction, board is NOT fully visible
+  const overflowsH = area.scrollWidth > area.clientWidth + 4;
+  const overflowsV = area.scrollHeight > area.clientHeight + 4;
 
-  // Check if the full canvas is visible within the scroll area's viewport
-  const topVisible = canvasRect.top >= areaRect.top - 2;
-  const bottomVisible = canvasRect.bottom <= areaRect.bottom + 2;
-  const leftVisible = canvasRect.left >= areaRect.left - 2;
-  const rightVisible = canvasRect.right <= areaRect.right + 2;
-
-  const fullyVisible = topVisible && bottomVisible && leftVisible && rightVisible;
+  const fullyVisible = !overflowsH && !overflowsV;
   area.classList.toggle('board-fully-visible', fullyVisible);
 }
 
