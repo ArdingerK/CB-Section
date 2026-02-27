@@ -4143,11 +4143,9 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
     const maxLeft = Math.max(0, area.scrollWidth - area.clientWidth);
 
     // Keep the board centered horizontally at every zoom level.
-    if (maxLeft <= 0 || scaledBoardW <= visibleWidth + 1) {
-      area.scrollLeft = 0;
-    } else {
-      area.scrollLeft = maxLeft / 2;
-    }
+    // Use the actual scrollable width rather than scaled board estimates,
+    // because CSS/layout can introduce extra width that should still be centered.
+    area.scrollLeft = maxLeft > 0 ? maxLeft / 2 : 0;
   });
 }
 
