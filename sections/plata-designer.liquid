@@ -1046,6 +1046,71 @@
 .pc-sd__drawer[data-drawer="tools"] .pc-sd__stepcard--3{
   border: 0 !important;
 }
+
+/* Uniform drawer card styling for all steps */
+.pc-sd__drawer {
+  border-radius: 12px !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+  background: #fff !important;
+  overflow: hidden !important;
+  margin-bottom: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+}
+
+.pc-sd__drawer-toggle {
+  background: #fff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 16px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* Remove any colored left-border or special border treatments on individual drawers */
+.pc-sd__drawer[data-drawer="board"],
+.pc-sd__drawer[data-drawer="stencils"],
+.pc-sd__drawer[data-drawer="tools"] {
+  border-left: none !important;
+  border-top: none !important;
+}
+
+/* Step number circles stay colored but same size */
+.pc-sd__drawer-num {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Title consistent size */
+.pc-sd__drawer-title {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #111 !important;
+  flex: 1 !important;
+}
+
+/* Sub text consistent */
+.pc-sd__drawer-sub {
+  font-size: 12px !important;
+  color: #888 !important;
+  white-space: nowrap !important;
+}
+
+/* Divider line when open */
+.pc-sd__drawer[data-open="true"] > .pc-sd__drawer-toggle {
+  border-bottom: 1px solid rgba(0,0,0,.08) !important;
+}
+
 .pc-sd__canvas-wrapper{
   display: flex !important;
   align-items: flex-start !important;
