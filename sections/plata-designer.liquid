@@ -3121,6 +3121,7 @@ font-weight: bold;
   align-items: center !important;
   justify-content: flex-start !important;
   padding: 32px 12px 160px 12px !important;
+  padding-bottom: 140px !important;
   overflow: auto !important;
   overscroll-behavior: contain !important;
   box-sizing: border-box !important;
@@ -3131,9 +3132,16 @@ font-weight: bold;
 @media (min-width: 990px) {
   .pc-sd__canvas-scroll-area {
     padding: 32px 12px 160px 12px !important;
+    padding-bottom: 140px !important;
     min-height: 400px !important;
     max-height: calc(100vh - 220px) !important;
   }
+}
+
+
+.pc-sd__rightcol > .pc-sd__bottombar {
+  margin-top: 24px !important;
+  flex-shrink: 0 !important;
 }
 
 </style>
