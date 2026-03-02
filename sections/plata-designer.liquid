@@ -4834,6 +4834,7 @@ el.onpointerdown = (e) => {
 
   if (!dragged) {
     if (item.multicolor) {
+      console.error('[MultiColor] Tile clicked, calling showMultiColorPanel for:', item.name);
       clearSelection();
       showMultiColorPanel(item, el);
     } else {
@@ -4870,6 +4871,7 @@ el.onpointerdown = (e) => {
 
 function showMultiColorPanel(item, tileEl) {
   const panel = root.querySelector('.pc-sd__multicolor-panel');
+  console.error('[MultiColor] showMultiColorPanel called, panel found:', !!panel, 'panel el:', panel);
   const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
 
   // DEBUG: check panel elements exist
