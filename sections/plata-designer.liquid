@@ -4873,7 +4873,7 @@ function showMultiColorPanel(item, tileEl) {
 
       // DEBUG: log what parts were found
       console.log('[MultiColor] SVG found?', !!svg);
-      console.log('[MultiColor] All <g id> elements:', svg ? Array.from(svg.querySelectorAll('g[id]')).map(g => g.id) : 'no svg');
+      console.log('[MultiColor] All g[id] elements:', svg ? Array.from(svg.querySelectorAll('g[id]')).map(g => g.id) : 'no svg');
       console.log('[MultiColor] Named parts found:', parts.map(p => p.id));
 
       if (parts.length === 0) {
