@@ -4651,6 +4651,25 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
       };
     }).filter(Boolean);
 
+    const multicolorItems = library.filter(s => s.multicolor);
+    console.error('[MultiColor] Count:', multicolorItems.length, 'Items:', multicolorItems.map(s => s.name));
+
+    if (multicolorItems.length === 0) {
+      console.error('[MultiColor] Candy cane raw values:',
+        rows.slice(1)
+          .map((row) => {
+            const cols = parseCSVLine(row);
+            const name = (cols[idx.name] || 'Stencil').trim();
+            return {
+              name,
+              rawMulticolor: idx.multicolor !== -1 ? (cols[idx.multicolor] || '') : 'COLUMN NOT FOUND',
+              multicolor: idx.multicolor !== -1 && (cols[idx.multicolor] || '').trim().toLowerCase() === 'true'
+            };
+          })
+          .filter(s => s.name && s.name.toLowerCase().includes('candy'))
+      );
+    }
+
     // DEBUG: log first 5 multicolor values to console
     console.log('[MultiColor Debug] idx.multicolor column index:', idx.multicolor);
     console.log('[MultiColor Debug] Header row:', headerRow);
