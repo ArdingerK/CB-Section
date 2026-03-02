@@ -5654,6 +5654,7 @@ optionalPacksUsed.forEach(pk => {
 }
 
 async function exportDesignPNG() {
+  const canvasEl = root.querySelector('.pc-sd__canvas');
   const stageEl =
   (stage && typeof stage.container === 'function') ? stage.container() :
   (stage && stage.nodeType === 1) ? stage :
@@ -5662,9 +5663,14 @@ async function exportDesignPNG() {
   root.querySelector('.pc-sd__canvas-wrap') ||
   root;
 
-  const stageRect = stageEl.getBoundingClientRect();
-  const w = Math.max(1, Math.round(stageRect.width));
-  const h = Math.max(1, Math.round(stageRect.height));
+  const canvasStyles = canvasEl ? getComputedStyle(canvasEl) : null;
+  const boardW = canvasStyles ? parseFloat(canvasStyles.getPropertyValue('--boardWpx')) : NaN;
+  const boardH = canvasStyles ? parseFloat(canvasStyles.getPropertyValue('--boardHpx')) : NaN;
+  const fallbackW = canvasEl ? canvasEl.offsetWidth : stageEl.offsetWidth;
+  const fallbackH = canvasEl ? canvasEl.offsetHeight : stageEl.offsetHeight;
+
+  const w = Math.max(1, Math.round(Number.isFinite(boardW) ? boardW : fallbackW));
+  const h = Math.max(1, Math.round(Number.isFinite(boardH) ? boardH : fallbackH));
 
   const scale = 2;
   const out = document.createElement('canvas');
@@ -5691,13 +5697,15 @@ async function exportDesignPNG() {
 
   // Placed stencils
   const placedEls = Array.from(stageEl.querySelectorAll('.pc-sd__placed'));
+  const currentZoom = parseFloat(getComputedStyle(root).getPropertyValue('--zoom')) || 1;
 
   for (const el of placedEls) {
-  const cx = (parseFloat(el.style.left) / 100) * w;
+    const cx = (parseFloat(el.style.left) / 100) * w;
     const cy = (parseFloat(el.style.top) / 100) * h;
     const rot = (parseInt(el.dataset.rot || '0', 10) * Math.PI) / 180;
-    const pw = el.offsetWidth;
-    const ph = el.offsetHeight;
+    const rect = el.getBoundingClientRect();
+    const pw = rect.width / currentZoom;
+    const ph = rect.height / currentZoom;
 
     const color = (el.style.getPropertyValue('--stencil-color') || currentColor).trim() || '#f5f5f5';
 
