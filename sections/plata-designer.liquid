@@ -4637,6 +4637,20 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
       };
     }).filter(Boolean);
 
+    // DEBUG: log first 5 multicolor values to console
+    console.log('[MultiColor Debug] idx.multicolor column index:', idx.multicolor);
+    console.log('[MultiColor Debug] Header row:', headerRow);
+    console.log('[MultiColor Debug] Sample multicolor values:',
+      rows.slice(1, 10).map(row => {
+        const cols = parseCSVLine(row);
+        return {
+          name: cols[idx.name],
+          raw: idx.multicolor !== -1 ? cols[idx.multicolor] : 'COLUMN NOT FOUND',
+          parsed: idx.multicolor !== -1 ? (cols[idx.multicolor] || '').trim().toLowerCase() === 'true' : false
+        };
+      })
+    );
+
     console.log('[Stencil Designer] Loaded stencils:', library.length);
     if (!library.length) {
       stencilGrid.innerHTML =
