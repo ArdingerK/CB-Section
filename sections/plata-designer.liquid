@@ -4824,6 +4824,11 @@ el.onpointerdown = (e) => {
 function showMultiColorPanel(item, tileEl) {
   const panel = root.querySelector('.pc-sd__multicolor-panel');
   const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
+
+  // DEBUG: check panel elements exist
+  console.log('[MultiColor] panel found?', !!panel, 'inner found?', !!inner);
+  console.log('[MultiColor] item.multicolor:', item.multicolor, 'item.src:', item.src);
+
   if (!panel || !inner) return;
 
   pendingMultiColorItem = item;
@@ -4837,6 +4842,11 @@ function showMultiColorPanel(item, tileEl) {
       const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
       const svg = doc.querySelector('svg');
       const parts = svg ? getNamedSvgParts(svg) : [];
+
+      // DEBUG: log what parts were found
+      console.log('[MultiColor] SVG found?', !!svg);
+      console.log('[MultiColor] All <g id> elements:', svg ? Array.from(svg.querySelectorAll('g[id]')).map(g => g.id) : 'no svg');
+      console.log('[MultiColor] Named parts found:', parts.map(p => p.id));
 
       if (parts.length === 0) {
         panel.style.display = 'none';
