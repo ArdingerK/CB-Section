@@ -169,6 +169,19 @@
   </div>
 </div>
 
+<!-- Multi-color part picker panel (shown when multicolor stencil is selected in palette) -->
+<div class="pc-sd__multicolor-panel" style="display:none;">
+  <div class="pc-sd__multicolor-panel-inner"></div>
+  <div style="display:flex; gap:8px; margin-top:10px;">
+    <button type="button" class="pc-sd__btn pc-sd__btn--primary pc-sd__btn--full pc-sd__multicolor-place">
+      Place on Board ✓
+    </button>
+    <button type="button" class="pc-sd__btn pc-sd__btn--ghost pc-sd__multicolor-cancel">
+      Cancel
+    </button>
+  </div>
+</div>
+
 
           </div><!-- /.pc-sd__design -->
         </div><!-- /.pc-sd__stepcard--2 -->
@@ -3534,6 +3547,51 @@ font-weight: bold;
     padding-bottom: 0 !important;
   }
 }
+
+.pc-sd__multicolor-panel {
+  background: #fff;
+  border: 2px solid #6bbfc2;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.pc-sd__multicolor-part-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pc-sd__multicolor-part-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.pc-sd__multicolor-part-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pc-sd__multicolor-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.15);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.pc-sd__multicolor-swatch.active {
+  border: 3px solid #333 !important;
+  transform: scale(1.15);
+}
+
 </style>
 
 <script>
@@ -4067,6 +4125,45 @@ if (outlineWidthInput) {
 let pendingPlaceItem = null;
 let pendingPlacePackKey = '';
 
+function getNamedSvgParts(svg) {
+  if (!svg) return [];
+  return Array.from(svg.querySelectorAll('g[id]')).filter(g => {
+    const id = g.id || '';
+    if (/^(Layer_?\d*|layer_?\d*|g\d+|svg\d+)$/i.test(id)) return false;
+    return g.querySelector('path, rect, circle, ellipse, polygon, polyline') !== null;
+  });
+}
+
+function applyColorMapToSvg(svg, colorMap) {
+  if (!svg || !colorMap) return;
+  Object.entries(colorMap).forEach(([partId, color]) => {
+    const group = svg.getElementById(partId) || svg.querySelector(`#${partId}`);
+    if (!group) return;
+    group.querySelectorAll('path, rect, circle, ellipse, polygon, polyline').forEach(n => {
+      n.style.setProperty('fill', color, 'important');
+      n.style.setProperty('stroke', 'none', 'important');
+    });
+  });
+}
+
+const stencilColorMaps = new WeakMap();
+
+const PART_COLORS = [
+  { name: 'White',  hex: '#f5f5f5' },
+  { name: 'Red',    hex: '#e63946' },
+  { name: 'Green',  hex: '#4dd14c' },
+  { name: 'Yellow', hex: '#ffd93b' },
+  { name: 'Pink',   hex: '#ff84ad' },
+  { name: 'Black',  hex: '#111111' },
+  { name: 'Orange', hex: '#ff7a30' },
+  { name: 'Blue',   hex: '#2fa4ff' },
+  { name: 'Purple', hex: '#b98efc' },
+  { name: 'Teal',   hex: '#4AB6B8' },
+];
+
+let pendingMultiColorItem = null;
+let pendingMultiColorMap = {};
+
 function clearSelection() {
   selectedEls.forEach(s => s.classList.remove('selected'));
   selectedEls.clear();
@@ -4512,7 +4609,8 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
       url: headers.findIndex(h => h.includes('url') || h.includes('link') || h.includes('src')),
       w: headers.indexOf('width'),
       h: headers.indexOf('height'),
-      pack: headers.indexOf('pack')
+      pack: headers.indexOf('pack'),
+      multicolor: headers.indexOf('multicolor')
     };
 
     // Hard fail if we can't find URL column
@@ -4534,7 +4632,8 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
         src,
         w: parseFloat(cols[idx.w]) || 4,
         h: parseFloat(cols[idx.h]) || 0,
-        pack: (cols[idx.pack] || 'General').trim()
+        pack: (cols[idx.pack] || 'General').trim(),
+        multicolor: idx.multicolor !== -1 && (cols[idx.multicolor] || '').trim().toLowerCase() === 'true'
       };
     }).filter(Boolean);
 
@@ -4676,6 +4775,7 @@ el.onpointerdown = (e) => {
       // 🔑 Important: clear any armed tap
       pendingPlaceItem = null;
       pendingPlacePackKey = '';
+      hideMultiColorPanel();
 
      startDragFromPalettePointer(m, item, el.dataset.pack);
 
@@ -4685,12 +4785,17 @@ el.onpointerdown = (e) => {
  const up = () => {
   cleanup();
 
-  // TAP (mouse OR touch): arm placement
   if (!dragged) {
-    pendingPlaceItem = item;
-    pendingPlacePackKey = el.dataset.pack;
-    setSelectedPaletteTile(el);
-    clearSelection();
+    if (item.multicolor) {
+      clearSelection();
+      showMultiColorPanel(item, el);
+    } else {
+      hideMultiColorPanel();
+      pendingPlaceItem = item;
+      pendingPlacePackKey = el.dataset.pack;
+      setSelectedPaletteTile(el);
+      clearSelection();
+    }
   }
 };
 
@@ -4714,6 +4819,116 @@ el.onpointerdown = (e) => {
 
   // apply current filter after items exist
   updateStencilFiltering();
+}
+
+function showMultiColorPanel(item, tileEl) {
+  const panel = root.querySelector('.pc-sd__multicolor-panel');
+  const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
+  if (!panel || !inner) return;
+
+  pendingMultiColorItem = item;
+  pendingMultiColorMap = {};
+  pendingPlaceItem = null;
+  pendingPlacePackKey = '';
+
+  fetch(item.src, { cache: 'force-cache' })
+    .then(r => r.text())
+    .then(txt => {
+      const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
+      const svg = doc.querySelector('svg');
+      const parts = svg ? getNamedSvgParts(svg) : [];
+
+      if (parts.length === 0) {
+        panel.style.display = 'none';
+        pendingPlaceItem = item;
+        pendingPlacePackKey = tileEl.dataset.pack || '';
+        setSelectedPaletteTile(tileEl);
+        return;
+      }
+
+      parts.forEach(g => { pendingMultiColorMap[g.id] = '#f5f5f5'; });
+
+      inner.innerHTML = `
+        <div style="font-weight:800; font-size:14px; margin-bottom:12px; color:#1f2937;">
+          Choose colors for each part:
+        </div>
+        ${parts.map(g => `
+          <div class="pc-sd__multicolor-part-row">
+            <div class="pc-sd__multicolor-part-label">${g.id.replace(/[-_]/g, ' ')}</div>
+            <div class="pc-sd__multicolor-part-swatches" data-part="${g.id}">
+              ${PART_COLORS.map(c => `
+                <div
+                  class="pc-sd__multicolor-swatch${pendingMultiColorMap[g.id] === c.hex ? ' active' : ''}"
+                  data-part="${g.id}"
+                  data-hex="${c.hex}"
+                  title="${c.name}"
+                  style="background:${c.hex};"
+                ></div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(swatch => {
+        swatch.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const partId = swatch.dataset.part;
+          const hex = swatch.dataset.hex;
+          pendingMultiColorMap[partId] = hex;
+
+          inner.querySelectorAll(`.pc-sd__multicolor-swatch[data-part="${partId}"]`)
+            .forEach(s => s.classList.toggle('active', s.dataset.hex === hex));
+        });
+      });
+
+      panel.style.display = 'block';
+      setSelectedPaletteTile(tileEl);
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    })
+    .catch(() => {
+      pendingPlaceItem = item;
+      pendingPlacePackKey = tileEl.dataset.pack || '';
+      setSelectedPaletteTile(tileEl);
+    });
+}
+
+function hideMultiColorPanel() {
+  const panel = root.querySelector('.pc-sd__multicolor-panel');
+  if (panel) panel.style.display = 'none';
+  pendingMultiColorItem = null;
+  pendingMultiColorMap = {};
+}
+
+const multiColorPlaceBtn = root.querySelector('.pc-sd__multicolor-place');
+const multiColorCancelBtn = root.querySelector('.pc-sd__multicolor-cancel');
+
+if (multiColorPlaceBtn) {
+  multiColorPlaceBtn.addEventListener('click', () => {
+    if (!pendingMultiColorItem) return;
+    const colorMapSnapshot = { ...pendingMultiColorMap };
+    const packKey = root.querySelector('.pc-sd__item.is-selected')?.dataset.pack || '';
+
+    createPlacedStencil(pendingMultiColorItem, lastPlace.x, lastPlace.y, packKey)
+      .then(placedEl => {
+        if (placedEl && Object.keys(colorMapSnapshot).length > 0) {
+          stencilColorMaps.set(placedEl, colorMapSnapshot);
+          const svg = placedEl.querySelector('svg');
+          if (svg) applyColorMapToSvg(svg, colorMapSnapshot);
+        }
+      });
+
+    hideMultiColorPanel();
+    setSelectedPaletteTile(null);
+  });
+}
+
+if (multiColorCancelBtn) {
+  multiColorCancelBtn.addEventListener('click', () => {
+    hideMultiColorPanel();
+    setSelectedPaletteTile(null);
+  });
 }
 
 function nudgePaletteScroll(px = 90) {
@@ -4851,6 +5066,7 @@ if (hint) {
     applyScale(el);
     stage.appendChild(el);
     updateHintVisibility();
+    hideMultiColorPanel();
     clearSelection();
     el.classList.add('selected');
     selectedEls.add(el);
@@ -4919,6 +5135,8 @@ const rect = stageEl.getBoundingClientRect();
 
   e.stopPropagation();
 };
+
+    return el;
 }    
 
   function applyScale(el) {
@@ -5715,7 +5933,18 @@ async function exportDesignPNG() {
 
     try {
       if (svg) {
-        srcForDraw = svgToDataURL(svg, color);
+        const colorMap = stencilColorMaps.get(el);
+        const parts = getNamedSvgParts(svg);
+
+        if (colorMap && parts.length > 0) {
+          const clonedSvg = svg.cloneNode(true);
+          clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+          applyColorMapToSvg(clonedSvg, colorMap);
+          const svgText = new XMLSerializer().serializeToString(clonedSvg);
+          srcForDraw = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+        } else {
+          srcForDraw = svgToDataURL(svg, color);
+        }
       } else if (img && img.src) {
         const objURL = await fetchAsObjectURL(img.src);
         srcForDraw = objURL;
