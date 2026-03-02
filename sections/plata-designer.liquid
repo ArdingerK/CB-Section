@@ -4602,16 +4602,20 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
     }
 
     const headerRow = parseCSVLine(rows[0]);
-    const headers = headerRow.map(h => (h || '').toLowerCase());
+    const headers = headerRow.map(h => (h || '').trim().toLowerCase());
 
     const idx = {
-      name: headers.indexOf('stencil name'),
+      name: headers.findIndex(h => h.includes('name') || h.includes('letter') || h.includes('stencil') || h === 'a'),
       url: headers.findIndex(h => h.includes('url') || h.includes('link') || h.includes('src')),
-      w: headers.indexOf('width'),
-      h: headers.indexOf('height'),
-      pack: headers.indexOf('pack'),
-      multicolor: headers.indexOf('multicolor')
+      w: headers.findIndex(h => h.includes('width') || h === 'w'),
+      h: headers.findIndex(h => h.includes('height') || h === 'h'),
+      pack: headers.findIndex(h => h.includes('pack')),
+      multicolor: headers.findIndex(h => h.includes('multicolor') || h.includes('multi color') || h.includes('multi_color'))
     };
+
+    // DEBUG: log all headers and their detected indices
+    console.log('[CSV Headers] Raw headers:', headerRow);
+    console.log('[CSV Headers] Detected indices:', idx);
 
     // Hard fail if we can't find URL column
     if (idx.url === -1) {
