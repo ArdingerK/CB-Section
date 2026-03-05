@@ -4137,7 +4137,11 @@ function getNamedSvgParts(svg) {
 function applyColorMapToSvg(svg, colorMap) {
   if (!svg || !colorMap) return;
   Object.entries(colorMap).forEach(([partId, color]) => {
-    const group = svg.getElementById(partId) || svg.querySelector(`#${partId}`);
+    const escapedPartId = (typeof CSS !== 'undefined' && CSS.escape)
+      ? CSS.escape(partId)
+      : String(partId).replace(/([ #;?%&,.+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+    const group = (typeof svg.getElementById === 'function' ? svg.getElementById(partId) : null)
+      || svg.querySelector(`#${escapedPartId}`);
     if (!group) return;
     group.querySelectorAll('path, rect, circle, ellipse, polygon, polyline').forEach(n => {
       n.style.setProperty('fill', color, 'important');
