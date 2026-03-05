@@ -4867,20 +4867,19 @@ el.onpointerdown = (e) => {
   cleanup();
 
   if (!dragged) {
-    console.log('Selected stencil:', item);
-    toggleMultiColorPanel(item);
+    console.log('[Stencil Click]', item);
+    console.log('[Stencil Click] multicolor:', item.multicolor);
 
-    if (item.multicolor) {
-      console.error('[MultiColor] Tile clicked, calling showMultiColorPanel for:', item.name);
-      clearSelection();
+    if (item.multicolor === true) {
       showMultiColorPanel(item, el);
-    } else {
-      hideMultiColorPanel();
-      pendingPlaceItem = item;
-      pendingPlacePackKey = el.dataset.pack;
-      setSelectedPaletteTile(el);
-      clearSelection();
+      return;
     }
+
+    hideMultiColorPanel();
+    pendingPlaceItem = item;
+    pendingPlacePackKey = el.dataset.pack;
+    setSelectedPaletteTile(el);
+    clearSelection();
   }
 };
 
