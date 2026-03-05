@@ -4177,10 +4177,24 @@ const PART_COLORS = [
 
 let pendingMultiColorItem = null;
 let pendingMultiColorMap = {};
+let pendingMultiColorPlacedEl = null;
 
 function clearSelection() {
   selectedEls.forEach(s => s.classList.remove('selected'));
   selectedEls.clear();
+}
+
+function reopenMultiColorPanelForPlaced(placedEl) {
+  if (!placedEl) return;
+  const stencilItem = placedEl.__stencilItem;
+
+  if (stencilItem?.multicolor !== true) return;
+
+  console.log('[MultiColor] placed stencil selected', placedEl);
+  console.log('[MultiColor] existing color map', stencilColorMaps.get(placedEl));
+
+  pendingMultiColorPlacedEl = placedEl;
+  showMultiColorPanel(stencilItem, placedEl);
 }
 
 // Clicking empty space on the board records position + clears selection (unless Shift is held)
@@ -4917,8 +4931,12 @@ function showMultiColorPanel(item, tileEl) {
 
   if (!panel || !inner) return;
 
+  const isPlacedStencil = !!(tileEl && tileEl.classList && tileEl.classList.contains('pc-sd__placed'));
+  const existingMap = isPlacedStencil ? stencilColorMaps.get(tileEl) : null;
+
   pendingMultiColorItem = item;
-  pendingMultiColorMap = {};
+  pendingMultiColorMap = existingMap ? { ...existingMap } : {};
+  if (!isPlacedStencil) pendingMultiColorPlacedEl = null;
   pendingPlaceItem = null;
   pendingPlacePackKey = '';
 
@@ -4942,7 +4960,9 @@ function showMultiColorPanel(item, tileEl) {
         return;
       }
 
-      parts.forEach(g => { pendingMultiColorMap[g.id] = '#f5f5f5'; });
+      parts.forEach(g => {
+        if (!pendingMultiColorMap[g.id]) pendingMultiColorMap[g.id] = '#f5f5f5';
+      });
 
       inner.innerHTML = `
         <div style="font-weight:800; font-size:14px; margin-bottom:12px; color:#1f2937;">
@@ -4980,13 +5000,13 @@ function showMultiColorPanel(item, tileEl) {
       });
 
       panel.style.display = 'block';
-      setSelectedPaletteTile(tileEl);
+      setSelectedPaletteTile(isPlacedStencil ? null : tileEl);
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     })
     .catch(() => {
       pendingPlaceItem = item;
-      pendingPlacePackKey = tileEl.dataset.pack || '';
-      setSelectedPaletteTile(tileEl);
+      pendingPlacePackKey = tileEl?.dataset?.pack || '';
+      setSelectedPaletteTile(isPlacedStencil ? null : tileEl);
     });
 }
 
@@ -4995,6 +5015,7 @@ function hideMultiColorPanel() {
   if (panel) panel.style.display = 'none';
   pendingMultiColorItem = null;
   pendingMultiColorMap = {};
+  pendingMultiColorPlacedEl = null;
 }
 
 function toggleMultiColorPanel(stencil) {
@@ -5015,9 +5036,19 @@ if (multiColorPlaceBtn) {
   multiColorPlaceBtn.addEventListener('click', () => {
     if (!pendingMultiColorItem) return;
     const colorMapSnapshot = { ...pendingMultiColorMap };
+
+    if (pendingMultiColorPlacedEl) {
+      const svg = pendingMultiColorPlacedEl.querySelector('svg');
+      if (svg) applyColorMapToSvg(svg, colorMapSnapshot);
+      stencilColorMaps.set(pendingMultiColorPlacedEl, colorMapSnapshot);
+      hideMultiColorPanel();
+      setSelectedPaletteTile(null);
+      return;
+    }
+
     const packKey = root.querySelector('.pc-sd__item.is-selected')?.dataset.pack || '';
 
-    createPlacedStencil(pendingMultiColorItem, lastPlace.x, lastPlace.y, packKey)
+    createPlacedStencil(pendingMultiColorItem, lastPlace.x, lastPlace.y, packKey, { skipMultiColorReopen: true })
       .then(placedEl => {
         if (placedEl && Object.keys(colorMapSnapshot).length > 0) {
           stencilColorMaps.set(placedEl, colorMapSnapshot);
@@ -5125,7 +5156,7 @@ const rect = stageEl.getBoundingClientRect();
   move(e);
   }
 
-    async function createPlacedStencil(item, x, y, packKey) {
+    async function createPlacedStencil(item, x, y, packKey, options = {}) {
     const hint = root.querySelector('.pc-sd__hint');
 if (hint) {
   hint.style.display = 'none';
@@ -5137,6 +5168,7 @@ if (hint) {
     el.className = 'pc-sd__placed';
     el.dataset.w = item.w;
     el.dataset.h = item.h;
+   el.__stencilItem = item;
    el.dataset.rot = "0";
    el.dataset.src = item.src;
    el.dataset.pack = (packKey || slugifyPackKey(item.pack) || '');
@@ -5187,6 +5219,9 @@ if (hint) {
     clearSelection();
     el.classList.add('selected');
     selectedEls.add(el);
+    if (item?.multicolor === true && !options.skipMultiColorReopen) {
+      reopenMultiColorPanelForPlaced(el);
+    }
     el.onpointerdown = (e) => {
   // stop page scroll while dragging on mobile
   e.preventDefault();
@@ -5206,6 +5241,7 @@ if (hint) {
       clearSelection();
       el.classList.add('selected');
       selectedEls.add(el);
+      reopenMultiColorPanelForPlaced(el);
     }
   }
 
