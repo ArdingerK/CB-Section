@@ -4840,6 +4840,8 @@ if (bg) el.style.setProperty('--pack-bg', bg);
 el.onpointerdown = (e) => {
   if (e.pointerType === 'mouse' && e.button !== 0) return;
 
+  console.log('[Palette] drag start', item.name, 'multicolor=', item.multicolor);
+
   const startX = e.clientX;
   const startY = e.clientY;
   let dragged = false;
@@ -4866,10 +4868,9 @@ el.onpointerdown = (e) => {
  const up = () => {
   cleanup();
 
-  if (!dragged) {
-    console.log('[Stencil Click]', item);
-    console.log('[Stencil Click] multicolor:', item.multicolor);
+  console.log('[Palette] item clicked', item.name, 'multicolor=', item.multicolor);
 
+  if (!dragged) {
     if (item.multicolor === true) {
       showMultiColorPanel(item, el);
       return;
@@ -5068,6 +5069,16 @@ function nudgePaletteScroll(px = 90) {
 }
 
 function startDragFromPalettePointer(e, item, packKey) {
+  const tileEl = e.currentTarget?.closest('.pc-sd__item') || e.target?.closest('.pc-sd__item');
+
+  if (item?.multicolor === true) {
+    console.log('[MultiColor] intercepted drag start for multicolor item', item);
+    e.preventDefault();
+    e.stopPropagation();
+    showMultiColorPanel(item, tileEl || e.currentTarget);
+    return;
+  }
+
   const ghost = root.querySelector('#drag-ghost-{{ section.id }}');
 if (!ghost) {
   console.warn('[Stencil Designer] Missing drag ghost element: #drag-ghost-{{ section.id }}');
