@@ -4127,12 +4127,16 @@ let pendingPlacePackKey = '';
 
 function getNamedSvgParts(svg) {
   if (!svg) return [];
-  const candidates = Array.from(svg.querySelectorAll('g[id], path[id]'));
-  return candidates.filter(el => {
+  const candidates = Array.from(svg.querySelectorAll('g[id], path[id], rect[id], circle[id], ellipse[id], polygon[id], polyline[id]'));
+  const named = candidates.filter(el => {
     const id = el.id || '';
     if (/^(Layer_?\d*|layer_?\d*|g\d+|svg\d+|Easter_Egg)$/i.test(id)) return false;
     return true;
   });
+
+  // Some vendor SVGs only use generic ids like Layer_1 / Layer_2.
+  // In that case, keep the original candidates so the multi-color panel can still render.
+  return named.length ? named : candidates;
 }
 
 function applyColorMapToSvg(svg, colorMap) {
@@ -4144,7 +4148,12 @@ function applyColorMapToSvg(svg, colorMap) {
     const group = (typeof svg.getElementById === 'function' ? svg.getElementById(partId) : null)
       || svg.querySelector(`#${escapedPartId}`);
     if (!group) return;
-    group.querySelectorAll('path, rect, circle, ellipse, polygon, polyline').forEach(n => {
+
+    const targetNodes = group.matches && group.matches('path, rect, circle, ellipse, polygon, polyline')
+      ? [group]
+      : Array.from(group.querySelectorAll('path, rect, circle, ellipse, polygon, polyline'));
+
+    targetNodes.forEach(n => {
       n.style.setProperty('fill', color, 'important');
       n.style.setProperty('stroke', 'none', 'important');
     });
