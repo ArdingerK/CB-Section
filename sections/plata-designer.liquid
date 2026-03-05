@@ -4127,10 +4127,11 @@ let pendingPlacePackKey = '';
 
 function getNamedSvgParts(svg) {
   if (!svg) return [];
-  return Array.from(svg.querySelectorAll('g[id]')).filter(g => {
-    const id = g.id || '';
-    if (/^(Layer_?\d*|layer_?\d*|g\d+|svg\d+)$/i.test(id)) return false;
-    return g.querySelector('path, rect, circle, ellipse, polygon, polyline') !== null;
+  const candidates = Array.from(svg.querySelectorAll('g[id], path[id]'));
+  return candidates.filter(el => {
+    const id = el.id || '';
+    if (/^(Layer_?\d*|layer_?\d*|g\d+|svg\d+|Easter_Egg)$/i.test(id)) return false;
+    return true;
   });
 }
 
