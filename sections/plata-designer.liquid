@@ -4182,6 +4182,52 @@ let pendingMultiColorPlacedEl = null;
 function clearSelection() {
   selectedEls.forEach(s => s.classList.remove('selected'));
   selectedEls.clear();
+  syncMultiColorPanelToSelection();
+}
+
+function syncMultiColorPanelToSelection() {
+  const selectionSize = selectedEls ? selectedEls.size : 0;
+  console.log('[MultiColor][SelectionSync] selection size:', selectionSize);
+
+  if (!selectedEls || selectionSize !== 1) {
+    console.log('[MultiColor][SelectionSync] hiding panel (none or multi-selection)');
+    hideMultiColorPanel();
+    return;
+  }
+
+  const [selectedEl] = Array.from(selectedEls);
+  const stencilItem = selectedEl?.__stencilItem;
+  const isMulticolor = stencilItem?.multicolor === true;
+  console.log('[MultiColor][SelectionSync] selected is multicolor:', isMulticolor, stencilItem?.name || '(unnamed)');
+
+  if (isMulticolor) {
+    console.log('[MultiColor][SelectionSync] showing panel for placed stencil');
+    reopenMultiColorPanelForPlaced(selectedEl);
+    return;
+  }
+
+  console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
+  hideMultiColorPanel();
+}
+
+function selectPlacedStencilFromEvent(placedEl, event) {
+  if (!placedEl) return;
+
+  if (event?.shiftKey) {
+    if (selectedEls.has(placedEl)) {
+      placedEl.classList.remove('selected');
+      selectedEls.delete(placedEl);
+    } else {
+      placedEl.classList.add('selected');
+      selectedEls.add(placedEl);
+    }
+  } else {
+    clearSelection();
+    placedEl.classList.add('selected');
+    selectedEls.add(placedEl);
+  }
+
+  syncMultiColorPanelToSelection();
 }
 
 function reopenMultiColorPanelForPlaced(placedEl) {
@@ -4202,6 +4248,12 @@ if (!stage || typeof stage.addEventListener !== 'function') {
   console.error('[Stencil Designer] stage is missing or invalid. Selector may be wrong or script ran before DOM was ready.', stage);
  } else {
   stage.addEventListener('pointerdown', (e) => {
+    const placed = e.target?.closest?.('.pc-sd__placed');
+    if (placed && stage.contains(placed)) {
+      selectPlacedStencilFromEvent(placed, e);
+      return;
+    }
+
     const rect = stage.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) {
       const xPct = ((e.clientX - rect.left) / rect.width) * 100;
@@ -4209,9 +4261,6 @@ if (!stage || typeof stage.addEventListener !== 'function') {
       lastPlace.x = Math.max(0, Math.min(100, xPct));
       lastPlace.y = Math.max(0, Math.min(100, yPct));
     }
-
-    // If you tapped a placed stencil, let its handler run (select/drag)
-    if (e.target && e.target.closest && e.target.closest('.pc-sd__placed')) return;
 
     // If we're armed to place, place NOW at this board tap
     if (pendingPlaceItem) {
@@ -4226,7 +4275,7 @@ if (!stage || typeof stage.addEventListener !== 'function') {
 
     // Otherwise it's empty space: clear unless Shift
     if (!e.shiftKey) clearSelection();
-  });
+  }, true);
 }
 
 const boardConfigs = {
@@ -5012,6 +5061,7 @@ function showMultiColorPanel(item, tileEl) {
 
 function hideMultiColorPanel() {
   const panel = root.querySelector('.pc-sd__multicolor-panel');
+  console.log('[MultiColor] hide panel');
   if (panel) panel.style.display = 'none';
   pendingMultiColorItem = null;
   pendingMultiColorMap = {};
@@ -5168,7 +5218,10 @@ if (hint) {
     el.className = 'pc-sd__placed';
     el.dataset.w = item.w;
     el.dataset.h = item.h;
-   el.__stencilItem = item;
+   el.__stencilItem = {
+    ...item,
+    multicolor: item?.multicolor === true
+   };
    el.dataset.rot = "0";
    el.dataset.src = item.src;
    el.dataset.pack = (packKey || slugifyPackKey(item.pack) || '');
@@ -5219,31 +5272,17 @@ if (hint) {
     clearSelection();
     el.classList.add('selected');
     selectedEls.add(el);
-    if (item?.multicolor === true && !options.skipMultiColorReopen) {
+    if (el.__stencilItem?.multicolor === true && !options.skipMultiColorReopen) {
       reopenMultiColorPanelForPlaced(el);
+    } else {
+      syncMultiColorPanelToSelection();
     }
     el.onpointerdown = (e) => {
   // stop page scroll while dragging on mobile
   e.preventDefault();
   try { el.setPointerCapture(e.pointerId); } catch(_) {}
 
-  // selection logic
-  if (e.shiftKey) {
-    if (selectedEls.has(el)) {
-      el.classList.remove('selected');
-      selectedEls.delete(el);
-    } else {
-      el.classList.add('selected');
-      selectedEls.add(el);
-    }
-  } else {
-    if (!(selectedEls.has(el) && selectedEls.size > 1)) {
-      clearSelection();
-      el.classList.add('selected');
-      selectedEls.add(el);
-      reopenMultiColorPanelForPlaced(el);
-    }
-  }
+  syncMultiColorPanelToSelection();
 
   if (selectedEls.size === 0) return;
 
@@ -5315,6 +5354,7 @@ const rect = stageEl.getBoundingClientRect();
   function clearBoard() {
     stage.querySelectorAll('.pc-sd__placed').forEach(el => el.remove());
     selectedEls.clear();
+    syncMultiColorPanelToSelection();
     const hint = root.querySelector('.pc-sd__hint');
     if (hint) hint.style.display = 'block';
   }
@@ -5416,6 +5456,7 @@ function deleteSelected() {
 
   selectedEls.forEach(el => el.remove());
   selectedEls.clear();
+  syncMultiColorPanelToSelection();
 
   const hint = root.querySelector('.pc-sd__hint');
   if (hint && !stage.querySelector('.pc-sd__placed')) {
