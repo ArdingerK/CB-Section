@@ -4195,6 +4195,19 @@ function clearSelection() {
   syncMultiColorPanelToSelection();
 }
 
+function openMulticolorIfSelected(placedEl) {
+  if (!placedEl) return;
+
+  const stencilItem = placedEl.__stencilItem;
+  if (!stencilItem) return;
+
+  if (stencilItem.multicolor !== true) return;
+
+  console.log('[MultiColor] opening editor for placed stencil');
+
+  reopenMultiColorPanelForPlaced(placedEl);
+}
+
 function syncMultiColorPanelToSelection() {
   const selectionSize = selectedEls ? selectedEls.size : 0;
   console.log('[MultiColor][SelectionSync] selection size:', selectionSize);
@@ -4206,19 +4219,12 @@ function syncMultiColorPanelToSelection() {
   }
 
   const [selectedEl] = Array.from(selectedEls);
-  const stencilItem = selectedEl?.__stencilItem;
-  const isMulticolor = isTruthyMulticolor(stencilItem?.multicolor);
-  console.log('[MultiColor][Select] __stencilItem.multicolor raw=%o, normalized=%o', stencilItem?.multicolor, isMulticolor);
-  console.log('[MultiColor][SelectionSync] selected is multicolor:', isMulticolor, stencilItem?.name || '(unnamed)');
+  openMulticolorIfSelected(selectedEl);
 
-  if (isMulticolor) {
-    console.log('[MultiColor][SelectionSync] showing panel for placed stencil');
-    reopenMultiColorPanelForPlaced(selectedEl);
-    return;
+  if (selectedEl?.__stencilItem?.multicolor !== true) {
+    console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
+    hideMultiColorPanel();
   }
-
-  console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
-  hideMultiColorPanel();
 }
 
 function selectPlacedStencilFromEvent(placedEl, event) {
@@ -4238,7 +4244,15 @@ function selectPlacedStencilFromEvent(placedEl, event) {
     selectedEls.add(placedEl);
   }
 
-  syncMultiColorPanelToSelection();
+  if (selectedEls.size === 1) {
+    const selectedEl = Array.from(selectedEls)[0];
+    openMulticolorIfSelected(selectedEl);
+    if (selectedEl?.__stencilItem?.multicolor !== true) {
+      hideMultiColorPanel();
+    }
+  } else {
+    hideMultiColorPanel();
+  }
 }
 
 function reopenMultiColorPanelForPlaced(placedEl) {
