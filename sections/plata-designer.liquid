@@ -4590,6 +4590,13 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
   });
 }
 
+function toBool(v) {
+  return String(v ?? '')
+    .trim()
+    .toLowerCase()
+    .match(/^(true|1|yes|y)$/) !== null;
+}
+
   async function loadLibrary() {
   try {
     console.log('[Stencil Designer] Fetching CSV:', CSV_URL);
@@ -4655,13 +4662,26 @@ function adjustCanvasViewportAfterZoom({ zoom, prevZoom, fromUser = false } = {}
       const src = (cols[idx.url] || '').trim();
       if (!src || !src.startsWith('http')) return null;
 
-      return {
-        name: (cols[idx.name] || 'Stencil').trim(),
+      const rowData = {
+        name: idx.name !== -1 ? cols[idx.name] : '',
         src,
-        w: parseFloat(cols[idx.w]) || 4,
-        h: parseFloat(cols[idx.h]) || 0,
-        pack: (cols[idx.pack] || 'General').trim(),
-        multicolor: idx.multicolor !== -1 && (cols[idx.multicolor] || '').trim().toLowerCase() === 'true'
+        w: idx.w !== -1 ? cols[idx.w] : '',
+        h: idx.h !== -1 ? cols[idx.h] : '',
+        pack: idx.pack !== -1 ? cols[idx.pack] : '',
+        multicolor: idx.multicolor !== -1 ? cols[idx.multicolor] : ''
+      };
+      const parsedMulticolor = toBool(rowData.multicolor);
+
+      console.log('Stencil row:', rowData);
+      console.log('Parsed multicolor:', parsedMulticolor);
+
+      return {
+        name: (rowData.name || 'Stencil').trim(),
+        src,
+        w: parseFloat(rowData.w) || 4,
+        h: parseFloat(rowData.h) || 0,
+        pack: (rowData.pack || 'General').trim(),
+        multicolor: parsedMulticolor
       };
     }).filter(Boolean);
 
@@ -4847,6 +4867,9 @@ el.onpointerdown = (e) => {
   cleanup();
 
   if (!dragged) {
+    console.log('Selected stencil:', item);
+    toggleMultiColorPanel(item);
+
     if (item.multicolor) {
       console.error('[MultiColor] Tile clicked, calling showMultiColorPanel for:', item.name);
       clearSelection();
@@ -4972,6 +4995,17 @@ function hideMultiColorPanel() {
   if (panel) panel.style.display = 'none';
   pendingMultiColorItem = null;
   pendingMultiColorMap = {};
+}
+
+function toggleMultiColorPanel(stencil) {
+  const panel = root.querySelector('.pc-sd__multicolor-panel');
+  if (!panel) return;
+
+  if (stencil?.multicolor === true) {
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
 }
 
 const multiColorPlaceBtn = root.querySelector('.pc-sd__multicolor-place');
