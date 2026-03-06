@@ -5310,7 +5310,19 @@ if (hint) {
   e.preventDefault();
   try { el.setPointerCapture(e.pointerId); } catch(_) {}
 
-  syncMultiColorPanelToSelection();
+  // After pointer down, selection will be updated — reopen panel if multicolor
+  requestAnimationFrame(() => {
+    if (selectedEls.size === 1) {
+      const [sel] = Array.from(selectedEls);
+      if (isTruthyMulticolor(sel?.__stencilItem?.multicolor)) {
+        reopenMultiColorPanelForPlaced(sel);
+      } else {
+        hideMultiColorPanel();
+      }
+    } else {
+      hideMultiColorPanel();
+    }
+  });
 
   if (selectedEls.size === 0) return;
 
