@@ -5301,7 +5301,7 @@ if (hint) {
     el.onpointerdown = (e) => {
   if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-  console.log('[PlacedStencil] pointerdown', el.__stencilItem?.name);
+  console.log('[PlacedStencil] pointerdown', el.__stencilItem?.name, 'multicolor=', el.__stencilItem?.multicolor);
 
   const startX = e.clientX;
   const startY = e.clientY;
@@ -5360,7 +5360,7 @@ if (hint) {
 
     if (!dragged) {
       console.log('[PlacedStencil] tap detected');
-      console.log('[PlacedStencil] multicolor=', el.__stencilItem?.multicolor);
+      syncMultiColorPanelToSelection();
       if (isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
         reopenMultiColorPanelForPlaced(el);
       } else {
