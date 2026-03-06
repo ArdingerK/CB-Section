@@ -4197,14 +4197,10 @@ function clearSelection() {
 
 function openMulticolorIfSelected(placedEl) {
   if (!placedEl) return;
-
   const stencilItem = placedEl.__stencilItem;
   if (!stencilItem) return;
-
   if (!isTruthyMulticolor(stencilItem.multicolor)) return;
-
   console.log('[MultiColor] opening editor for placed stencil');
-
   reopenMultiColorPanelForPlaced(placedEl);
 }
 
