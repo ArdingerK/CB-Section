@@ -4219,12 +4219,13 @@ function syncMultiColorPanelToSelection() {
   }
 
   const [selectedEl] = Array.from(selectedEls);
-  openMulticolorIfSelected(selectedEl);
-
   if (!isTruthyMulticolor(selectedEl?.__stencilItem?.multicolor)) {
     console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
     hideMultiColorPanel();
+    return;
   }
+
+  openMulticolorIfSelected(selectedEl);
 }
 
 function selectPlacedStencilFromEvent(placedEl, event) {
