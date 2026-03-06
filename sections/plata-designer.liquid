@@ -4201,7 +4201,7 @@ function openMulticolorIfSelected(placedEl) {
   const stencilItem = placedEl.__stencilItem;
   if (!stencilItem) return;
 
-  if (stencilItem.multicolor !== true) return;
+  if (!isTruthyMulticolor(stencilItem.multicolor)) return;
 
   console.log('[MultiColor] opening editor for placed stencil');
 
@@ -4221,7 +4221,7 @@ function syncMultiColorPanelToSelection() {
   const [selectedEl] = Array.from(selectedEls);
   openMulticolorIfSelected(selectedEl);
 
-  if (selectedEl?.__stencilItem?.multicolor !== true) {
+  if (!isTruthyMulticolor(selectedEl?.__stencilItem?.multicolor)) {
     console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
     hideMultiColorPanel();
   }
@@ -4244,15 +4244,7 @@ function selectPlacedStencilFromEvent(placedEl, event) {
     selectedEls.add(placedEl);
   }
 
-  if (selectedEls.size === 1) {
-    const selectedEl = Array.from(selectedEls)[0];
-    openMulticolorIfSelected(selectedEl);
-    if (selectedEl?.__stencilItem?.multicolor !== true) {
-      hideMultiColorPanel();
-    }
-  } else {
-    hideMultiColorPanel();
-  }
+  syncMultiColorPanelToSelection();
 }
 
 function reopenMultiColorPanelForPlaced(placedEl) {
