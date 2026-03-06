@@ -5299,27 +5299,18 @@ if (hint) {
       syncMultiColorPanelToSelection();
     }
     el.onpointerdown = (e) => {
-  // stop page scroll while dragging on mobile
-  e.preventDefault();
-  try { el.setPointerCapture(e.pointerId); } catch(_) {}
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-  // After pointer down, selection will be updated — reopen panel if multicolor
-  requestAnimationFrame(() => {
-    if (selectedEls.size === 1) {
-      const [sel] = Array.from(selectedEls);
-      if (isTruthyMulticolor(sel?.__stencilItem?.multicolor)) {
-        reopenMultiColorPanelForPlaced(sel);
-      } else {
-        hideMultiColorPanel();
-      }
-    } else {
-      hideMultiColorPanel();
-    }
-  });
+  console.log('[PlacedStencil] pointerdown', el.__stencilItem?.name);
+
+  const startX = e.clientX;
+  const startY = e.clientY;
+  let dragged = false;
+
+  selectPlacedStencilFromEvent(el, e);
 
   if (selectedEls.size === 0) return;
 
-  const startX = e.clientX, startY = e.clientY;
   const stageEl =
   root.querySelector('.pc-sd__stage') ||
   root.querySelector('.pc-sd__stage-inner') ||
@@ -5327,8 +5318,7 @@ if (hint) {
   root.querySelector('.pc-sd__canvas-wrap') ||
   root;
 
-const rect = stageEl.getBoundingClientRect();
-
+  const rect = stageEl.getBoundingClientRect();
 
   const starts = Array.from(selectedEls).map(s => ({
     el: s,
@@ -5336,10 +5326,21 @@ const rect = stageEl.getBoundingClientRect();
     ly: parseFloat(s.style.top)
   }));
 
-  const pMove = (pm) => {
+  const move = (pm) => {
+    const dx = pm.clientX - startX;
+    const dy = pm.clientY - startY;
+
+    if (!dragged && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      dragged = true;
+      console.log('[PlacedStencil] drag detected');
+      try { el.setPointerCapture(e.pointerId); } catch(_) {}
+    }
+
+    if (!dragged) return;
+
     pm.preventDefault();
-    const dxPct = ((pm.clientX - startX) / rect.width) * 100;
-    const dyPct = ((pm.clientY - startY) / rect.height) * 100;
+    const dxPct = (dx / rect.width) * 100;
+    const dyPct = (dy / rect.height) * 100;
 
     starts.forEach(o => {
       o.el.style.left = (o.lx + dxPct) + '%';
@@ -5347,17 +5348,33 @@ const rect = stageEl.getBoundingClientRect();
     });
   };
 
-    const pUp = () => {
-    try { el.releasePointerCapture(e.pointerId); } catch(_) {}
-    window.removeEventListener('pointermove', pMove);
-    window.removeEventListener('pointerup', pUp);
-    window.removeEventListener('pointercancel', pUp);
+  const cleanup = () => {
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    window.removeEventListener('pointercancel', up);
   };
 
-  window.addEventListener('pointermove', pMove, { passive: false });
-  window.addEventListener('pointerup', pUp);
-  window.addEventListener('pointercancel', pUp);
+  const up = () => {
+    try { el.releasePointerCapture(e.pointerId); } catch(_) {}
+    cleanup();
 
+    if (!dragged) {
+      console.log('[PlacedStencil] tap detected');
+      console.log('[PlacedStencil] multicolor=', el.__stencilItem?.multicolor);
+      if (isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
+        reopenMultiColorPanelForPlaced(el);
+      } else {
+        hideMultiColorPanel();
+      }
+      return;
+    }
+  };
+
+  window.addEventListener('pointermove', move, { passive: false });
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+
+  e.preventDefault();
   e.stopPropagation();
 };
 
