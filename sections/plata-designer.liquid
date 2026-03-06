@@ -4989,6 +4989,7 @@ el.onpointerdown = (e) => {
 
 function showMultiColorPanel(item, tileEl) {
   const panel = root.querySelector('.pc-sd__multicolor-panel');
+  const isPaletteTile = tileEl?.classList?.contains('pc-sd__item');
   console.error('[MultiColor] showMultiColorPanel called, panel found:', !!panel, 'panel el:', panel);
   const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
 
@@ -5022,8 +5023,10 @@ function showMultiColorPanel(item, tileEl) {
       if (parts.length === 0) {
         panel.style.display = 'none';
         pendingPlaceItem = item;
-        pendingPlacePackKey = tileEl.dataset.pack || '';
-        setSelectedPaletteTile(tileEl);
+        pendingPlacePackKey = isPaletteTile ? (tileEl.dataset.pack || '') : '';
+        if (isPaletteTile) {
+          setSelectedPaletteTile(tileEl);
+        }
         return;
       }
 
