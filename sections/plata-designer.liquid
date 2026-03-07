@@ -4202,17 +4202,28 @@ function applyColorMapToSvg(svg, colorMap) {
 
 const stencilColorMaps = new WeakMap();
 
-const PART_COLORS = [
-  { name: 'White',  hex: '#f5f5f5' },
-  { name: 'Red',    hex: '#e63946' },
-  { name: 'Green',  hex: '#4dd14c' },
-  { name: 'Yellow', hex: '#ffd93b' },
-  { name: 'Pink',   hex: '#ff84ad' },
-  { name: 'Black',  hex: '#111111' },
-  { name: 'Orange', hex: '#ff7a30' },
-  { name: 'Blue',   hex: '#2fa4ff' },
-  { name: 'Purple', hex: '#b98efc' },
-  { name: 'Teal',   hex: '#4AB6B8' },
+const STANDARD_MARKER_COLORS = [
+  { name:'White',  hex:'#f5f5f5' },
+  { name:'Orange', hex:'#ff7a30' },
+  { name:'Yellow', hex:'#ffd93b' },
+  { name:'Green',  hex:'#4dd14c' },
+  { name:'Blue',   hex:'#2fa4ff' },
+  { name:'Red',    hex:'#ff4b5c' }
+];
+
+const TWELVE_PACK_MARKER_COLORS = [
+  { name:'White', hex:'#f5f5f5' },
+  { name:'Black', hex:'#111111' },
+  { name:'Metallic red', hex:'#e86a7c' },
+  { name:'Bronze', hex:'#c5863c' },
+  { name:'Gold', hex:'#e0bf45' },
+  { name:'Silver', hex:'#d4d6dd' },
+  { name:'Dark green', hex:'#0da564' },
+  { name:'Light green', hex:'#8ee86b' },
+  { name:'Light blue', hex:'#63d5ff' },
+  { name:'Deep blue', hex:'#4989f5' },
+  { name:'Purple', hex:'#b98efc' },
+  { name:'Pink', hex:'#ff84ad' }
 ];
 
 function isTruthyMulticolor(value) {
@@ -5105,10 +5116,22 @@ function showMultiColorPanel(item, tileEl) {
           `).join('')}
         </div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Marker Colors</div>
-        <div class="pc-sd__multicolor-palette">
-          ${PART_COLORS.map(c => `
+        <div class="pc-sd__minihead" style="opacity:.8; margin-bottom:8px;">Standard Colors</div>
+        <div class="pc-sd__multicolor-palette pc-sd__swatches" style="margin-bottom:12px;">
+          ${STANDARD_MARKER_COLORS.map(c => `
             <div
-              class="pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' active' : ''}"
+              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' active' : ''}"
+              data-hex="${c.hex}"
+              title="${c.name}"
+              style="background:${c.hex};"
+            ></div>
+          `).join('')}
+        </div>
+        <div class="pc-sd__minihead" style="margin-bottom:8px;">12-Pack Colors</div>
+        <div class="pc-sd__multicolor-palette pc-sd__swatches">
+          ${TWELVE_PACK_MARKER_COLORS.map(c => `
+            <div
+              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' active' : ''}"
               data-hex="${c.hex}"
               title="${c.name}"
               style="background:${c.hex};"
@@ -6660,30 +6683,6 @@ if (zoomSliderMobile) {
   }, { passive: true });
 }
 
-  const standardSet = [
-    { name:'White',  hex:'#f5f5f5' },
-    { name:'Orange', hex:'#ff7a30' },
-    { name:'Yellow', hex:'#ffd93b' },
-    { name:'Green',  hex:'#4dd14c' },
-    { name:'Blue',   hex:'#2fa4ff' },
-    { name:'Red',    hex:'#ff4b5c' }
-  ];
-
-  const deluxeSet = [
-    { name:'White', hex:'#f5f5f5' },
-    { name:'Black', hex:'#111111' },
-    { name:'Metallic red', hex:'#e86a7c' },
-    { name:'Bronze', hex:'#c5863c' },
-    { name:'Gold', hex:'#e0bf45' },
-    { name:'Silver', hex:'#d4d6dd' },
-    { name:'Dark green', hex:'#0da564' },
-    { name:'Light green', hex:'#8ee86b' },
-    { name:'Light blue', hex:'#63d5ff' },
-    { name:'Deep blue', hex:'#4989f5' },
-    { name:'Purple', hex:'#b98efc' },
-    { name:'Pink', hex:'#ff84ad' }
-  ];
-
   function createSwatches(list, containerId) {
   const ctn = root.querySelector(containerId.startsWith('#') ? containerId : ('#' + containerId));
   if (!ctn) return;
@@ -6746,10 +6745,10 @@ function createOutlineSwatches(list, containerId) {
 }
 
 // build swatches
-createSwatches(standardSet, 'swatches-6-{{ section.id }}');
-createSwatches(deluxeSet, 'swatches-12-{{ section.id }}');
+createSwatches(STANDARD_MARKER_COLORS, 'swatches-6-{{ section.id }}');
+createSwatches(TWELVE_PACK_MARKER_COLORS, 'swatches-12-{{ section.id }}');
 // Outline palette can reuse the same list (or deluxeSet if you prefer)
-createOutlineSwatches(deluxeSet, 'swatches-outline-{{ section.id }}');
+createOutlineSwatches(TWELVE_PACK_MARKER_COLORS, 'swatches-outline-{{ section.id }}');
 
 console.log('[Stencil Designer] All elements found, initializing...');
 initMain(root, canvas, stage, boardImg);
