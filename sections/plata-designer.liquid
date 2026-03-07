@@ -5256,7 +5256,7 @@ function nudgePaletteScroll(px = 90) {
 }
 
 function startDragFromPalettePointer(e, item, packKey) {
-  const tileEl = e.currentTarget?.closest('.pc-sd__item') || e.target?.closest('.pc-sd__item');
+  const tileEl = e.target?.closest('.pc-sd__item');
 
   if (isTruthyMulticolor(item?.multicolor)) {
     console.log('[MultiColor] intercepted drag start for multicolor item', item);
