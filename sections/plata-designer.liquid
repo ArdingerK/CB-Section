@@ -3576,6 +3576,18 @@ font-weight: bold;
   margin-top: 10px;
 }
 
+.pc-sd__multicolor-title{
+  font-weight:600;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.pc-sd__multicolor-subtitle{
+  font-size:12px;
+  color:#666;
+  margin-bottom:10px;
+}
+
 .pc-sd__multicolor-part-row {
   display: flex;
   align-items: center;
@@ -5098,9 +5110,8 @@ function showMultiColorPanel(item, tileEl) {
       }
 
       inner.innerHTML = `
-        <div style="font-weight:800; font-size:14px; margin-bottom:12px; color:#1f2937;">
-          Multi-Color Stencil
-        </div>
+        <div class="pc-sd__multicolor-title">Multi-Color Stencil</div>
+        <div class="pc-sd__multicolor-subtitle">Select a stencil part, then choose a marker color to apply.</div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Select a part:</div>
         <div class="pc-sd__multicolor-part-list">
           ${parts.map(g => `
