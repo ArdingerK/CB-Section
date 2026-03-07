@@ -171,6 +171,7 @@
 
 <!-- Multi-color part picker panel (shown when multicolor stencil is selected in palette) -->
 <div class="pc-sd__multicolor-panel" style="display:none;">
+  <button type="button" class="pc-sd__multicolor-close" aria-label="Close multi-color panel">×</button>
   <div class="pc-sd__multicolor-panel-inner"></div>
   <div style="display:flex; gap:8px; margin-top:10px;">
     <button type="button" class="pc-sd__btn pc-sd__btn--primary pc-sd__btn--full pc-sd__multicolor-place">
@@ -3569,11 +3570,35 @@ font-weight: bold;
 }
 
 .pc-sd__multicolor-panel {
+  position: relative;
   background: #fff;
   border: 2px solid #6bbfc2;
   border-radius: 12px;
   padding: 14px;
   margin-top: 10px;
+}
+
+.pc-sd__multicolor-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 18px;
+  line-height: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.pc-sd__multicolor-close:hover {
+  border-color: #999;
+  color: #222;
 }
 
 .pc-sd__multicolor-title{
@@ -5259,6 +5284,7 @@ function hideMultiColorPanel() {
 
 const multiColorPlaceBtn = root.querySelector('.pc-sd__multicolor-place');
 const multiColorCancelBtn = root.querySelector('.pc-sd__multicolor-cancel');
+const multiColorCloseBtn = root.querySelector('.pc-sd__multicolor-close');
 
 if (multiColorPlaceBtn) {
   multiColorPlaceBtn.addEventListener('click', () => {
@@ -5292,6 +5318,13 @@ if (multiColorPlaceBtn) {
 
 if (multiColorCancelBtn) {
   multiColorCancelBtn.addEventListener('click', () => {
+    hideMultiColorPanel();
+    setSelectedPaletteTile(null);
+  });
+}
+
+if (multiColorCloseBtn) {
+  multiColorCloseBtn.addEventListener('click', () => {
     hideMultiColorPanel();
     setSelectedPaletteTile(null);
   });
