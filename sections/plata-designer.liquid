@@ -4195,56 +4195,17 @@ function clearSelection() {
   syncMultiColorPanelToSelection();
 }
 
-function openMulticolorIfSelected(placedEl) {
-  console.log('[DEBUG] openMulticolorIfSelected');
-  if (!placedEl) return;
-  const stencilItem = placedEl.__stencilItem;
-  if (!stencilItem) return;
-  if (!isTruthyMulticolor(stencilItem.multicolor)) return;
-  console.log('[MultiColor] opening editor for placed stencil');
-  reopenMultiColorPanelForPlaced(placedEl);
-}
+function syncMultiColorPanelToSelection(stencil){
+  if(!stencil){
+    hideMultiColorPanel();
+    return;
+  }
 
-function showMultiColorPanelFromPlaced(el) {
-  if (!el) return;
-
-  const src = el.dataset.stencilSrc || el.dataset.src;
-  const stencilItem = (LIB || []).find((s) => s.src === src);
-
-  if (!stencilItem) return;
-
-  showMultiColorPanel(stencilItem, el);
-}
-
-function maybeOpenMulticolorForPlaced(el) {
-  if (!el) return;
-
-  if (el.dataset.multicolor === 'true') {
-    showMultiColorPanelFromPlaced(el);
+  if(isTruthyMulticolor(stencil.multicolor)){
+    showMultiColorPanel(stencil);
   } else {
     hideMultiColorPanel();
   }
-}
-
-function syncMultiColorPanelToSelection() {
-  console.log('[DEBUG] syncMultiColorPanelToSelection');
-  const selectionSize = selectedEls ? selectedEls.size : 0;
-  console.log('[MultiColor][SelectionSync] selection size:', selectionSize);
-
-  if (!selectedEls || selectionSize !== 1) {
-    console.log('[MultiColor][SelectionSync] hiding panel (none or multi-selection)');
-    hideMultiColorPanel();
-    return;
-  }
-
-  const [selectedEl] = Array.from(selectedEls);
-  if (!isTruthyMulticolor(selectedEl?.__stencilItem?.multicolor)) {
-    console.log('[MultiColor][SelectionSync] hiding panel (selected stencil is not multicolor)');
-    hideMultiColorPanel();
-    return;
-  }
-
-  openMulticolorIfSelected(selectedEl);
 }
 
 function selectPlacedStencilFromEvent(placedEl, event) {
@@ -4265,14 +4226,11 @@ function selectPlacedStencilFromEvent(placedEl, event) {
     selectedEls.add(placedEl);
   }
 
-  syncMultiColorPanelToSelection();
+  const selectedStencil = selectedEls.size === 1 ? Array.from(selectedEls)[0]?.__stencilItem : null;
+  syncMultiColorPanelToSelection(selectedStencil);
 
   if (!event?.shiftKey && selectedEls.size === 1 && selectedEls.has(placedEl) && isTruthyMulticolor(placedEl?.__stencilItem?.multicolor)) {
     reopenMultiColorPanelForPlaced(placedEl);
-  }
-
-  if (placedEl.classList.contains('selected')) {
-    maybeOpenMulticolorForPlaced(placedEl);
   }
 }
 
@@ -5128,17 +5086,6 @@ function hideMultiColorPanel() {
   pendingMultiColorPlacedEl = null;
 }
 
-function toggleMultiColorPanel(stencil) {
-  const panel = root.querySelector('.pc-sd__multicolor-panel');
-  if (!panel) return;
-
-  if (isTruthyMulticolor(stencil?.multicolor)) {
-    panel.style.display = 'block';
-  } else {
-    panel.style.display = 'none';
-  }
-}
-
 const multiColorPlaceBtn = root.querySelector('.pc-sd__multicolor-place');
 const multiColorCancelBtn = root.querySelector('.pc-sd__multicolor-cancel');
 
@@ -5341,7 +5288,7 @@ if (hint) {
     if (isTruthyMulticolor(el.__stencilItem?.multicolor) && !options.skipMultiColorReopen) {
       reopenMultiColorPanelForPlaced(el);
     } else {
-      syncMultiColorPanelToSelection();
+      syncMultiColorPanelToSelection(el.__stencilItem);
     }
     el.onpointerdown = (e) => {
   if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -5405,11 +5352,9 @@ if (hint) {
 
     if (!dragged) {
       console.log('[PlacedStencil] tap detected');
-      syncMultiColorPanelToSelection();
+      syncMultiColorPanelToSelection(el.__stencilItem);
       if (isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
         reopenMultiColorPanelForPlaced(el);
-      } else {
-        hideMultiColorPanel();
       }
       return;
     }
