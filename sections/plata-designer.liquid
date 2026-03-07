@@ -4196,6 +4196,7 @@ function clearSelection() {
 }
 
 function openMulticolorIfSelected(placedEl) {
+  console.log('[DEBUG] openMulticolorIfSelected');
   if (!placedEl) return;
   const stencilItem = placedEl.__stencilItem;
   if (!stencilItem) return;
@@ -4205,6 +4206,7 @@ function openMulticolorIfSelected(placedEl) {
 }
 
 function syncMultiColorPanelToSelection() {
+  console.log('[DEBUG] syncMultiColorPanelToSelection');
   const selectionSize = selectedEls ? selectedEls.size : 0;
   console.log('[MultiColor][SelectionSync] selection size:', selectionSize);
 
@@ -4225,6 +4227,7 @@ function syncMultiColorPanelToSelection() {
 }
 
 function selectPlacedStencilFromEvent(placedEl, event) {
+  console.log('[DEBUG] selectPlacedStencilFromEvent');
   if (!placedEl) return;
 
   if (event?.shiftKey) {
@@ -4242,9 +4245,14 @@ function selectPlacedStencilFromEvent(placedEl, event) {
   }
 
   syncMultiColorPanelToSelection();
+
+  if (!event?.shiftKey && selectedEls.size === 1 && selectedEls.has(placedEl) && isTruthyMulticolor(placedEl?.__stencilItem?.multicolor)) {
+    reopenMultiColorPanelForPlaced(placedEl);
+  }
 }
 
 function reopenMultiColorPanelForPlaced(placedEl) {
+  console.log('[DEBUG] reopenMultiColorPanelForPlaced');
   if (!placedEl) return;
   const stencilItem = placedEl.__stencilItem;
 
@@ -4261,9 +4269,10 @@ function reopenMultiColorPanelForPlaced(placedEl) {
 if (!stage || typeof stage.addEventListener !== 'function') {
   console.error('[Stencil Designer] stage is missing or invalid. Selector may be wrong or script ran before DOM was ready.', stage);
  } else {
-  stage.addEventListener('pointerdown', (e) => {
+ stage.addEventListener('pointerdown', (e) => {
     const placed = e.target?.closest?.('.pc-sd__placed');
     if (placed && stage.contains(placed)) {
+      console.log('[DEBUG] stage pointerdown placed stencil');
       selectPlacedStencilFromEvent(placed, e);
       return;
     }
