@@ -4205,6 +4205,27 @@ function openMulticolorIfSelected(placedEl) {
   reopenMultiColorPanelForPlaced(placedEl);
 }
 
+function showMultiColorPanelFromPlaced(el) {
+  if (!el) return;
+
+  const src = el.dataset.stencilSrc || el.dataset.src;
+  const stencilItem = (LIB || []).find((s) => s.src === src);
+
+  if (!stencilItem) return;
+
+  showMultiColorPanel(stencilItem, el);
+}
+
+function maybeOpenMulticolorForPlaced(el) {
+  if (!el) return;
+
+  if (el.dataset.multicolor === 'true') {
+    showMultiColorPanelFromPlaced(el);
+  } else {
+    hideMultiColorPanel();
+  }
+}
+
 function syncMultiColorPanelToSelection() {
   console.log('[DEBUG] syncMultiColorPanelToSelection');
   const selectionSize = selectedEls ? selectedEls.size : 0;
@@ -4248,6 +4269,10 @@ function selectPlacedStencilFromEvent(placedEl, event) {
 
   if (!event?.shiftKey && selectedEls.size === 1 && selectedEls.has(placedEl) && isTruthyMulticolor(placedEl?.__stencilItem?.multicolor)) {
     reopenMultiColorPanelForPlaced(placedEl);
+  }
+
+  if (placedEl.classList.contains('selected')) {
+    maybeOpenMulticolorForPlaced(placedEl);
   }
 }
 
@@ -5253,6 +5278,9 @@ if (hint) {
    };
    el.dataset.rot = "0";
    el.dataset.src = item.src;
+   el.dataset.stencilSrc = item.src;
+   el.dataset.stencilName = item.name;
+   el.dataset.multicolor = normalizedMulticolor ? 'true' : 'false';
    el.dataset.pack = (packKey || slugifyPackKey(item.pack) || '');
 
 
