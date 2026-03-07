@@ -2790,6 +2790,17 @@ font-weight: bold;
   position: relative;
   z-index: 1;
 }
+
+.pc-sd__multicolor-indicator{
+  position:absolute;
+  top:4px;
+  right:6px;
+  font-size:12px;
+  color:#f59e0b;
+  pointer-events:none;
+  z-index:2;
+}
+
 .pc-sd__item[data-pack="letters--cursive-lowercase"]{
   --pack-bg: rgb(248, 201, 236);
 }
@@ -4836,6 +4847,14 @@ function renderLibrary(lib) {
 const bg = bgForPack(pk);
 if (bg) el.style.setProperty('--pack-bg', bg);
 
+const addMulticolorIndicator = () => {
+  if (!isTruthyMulticolor(item.multicolor)) return;
+  const indicator = document.createElement('span');
+  indicator.className = 'pc-sd__multicolor-indicator';
+  indicator.textContent = '★';
+  el.appendChild(indicator);
+};
+
 
    // Inline SVG for palette so we can normalize visual size
 (async () => {
@@ -4879,6 +4898,7 @@ if (bg) el.style.setProperty('--pack-bg', bg);
 
     el.innerHTML = '';
     el.appendChild(svg);
+    addMulticolorIndicator();
 
     // --- Normalize visual height ---
     requestAnimationFrame(() => {
@@ -4908,6 +4928,7 @@ if (bg) el.style.setProperty('--pack-bg', bg);
   } catch (err) {
     // Fallback: plain img
     el.innerHTML = `<img src="${item.src}" draggable="false">`;
+    addMulticolorIndicator();
   }
 })();
 
