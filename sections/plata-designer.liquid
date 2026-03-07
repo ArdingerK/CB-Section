@@ -4295,6 +4295,13 @@ if (!stage || typeof stage.addEventListener !== 'function') {
   console.error('[Stencil Designer] stage is missing or invalid. Selector may be wrong or script ran before DOM was ready.', stage);
  } else {
  stage.addEventListener('pointerdown', (e) => {
+    if (
+      e.target?.closest?.('.pc-sd__item') ||
+      e.target?.closest?.('.pc-sd__multicolor-panel')
+    ) {
+      return;
+    }
+
     const placed = e.target?.closest?.('.pc-sd__placed');
     if (placed && stage.contains(placed)) {
       console.log('[DEBUG] stage pointerdown placed stencil');
@@ -5028,6 +5035,8 @@ function showMultiColorPanel(item, tileEl) {
   console.log('[MultiColor] item.multicolor:', item.multicolor, 'item.src:', item.src);
 
   if (!panel || !inner) return;
+
+  panel.style.display = 'block';
 
   const isPlacedStencil = !!(tileEl && tileEl.classList && tileEl.classList.contains('pc-sd__placed'));
   const existingMap = isPlacedStencil ? stencilColorMaps.get(tileEl) : null;
