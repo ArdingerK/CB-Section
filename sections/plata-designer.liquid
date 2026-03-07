@@ -3603,6 +3603,20 @@ font-weight: bold;
   gap: 6px;
 }
 
+.pc-sd__multicolor-preview{
+  width:160px;
+  height:160px;
+  margin:10px auto 14px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.pc-sd__multicolor-preview svg{
+  max-width:100%;
+  max-height:100%;
+}
+
 .pc-sd__multicolor-part-label {
   font-size: 13px;
   font-weight: 700;
@@ -3630,6 +3644,11 @@ font-weight: bold;
 .pc-sd__multicolor-swatch.active {
   border: 3px solid #333 !important;
   transform: scale(1.15);
+}
+
+.mc-active-part{
+  filter: drop-shadow(0 0 4px rgba(255,180,0,0.9));
+  stroke-width:2;
 }
 
 </style>
@@ -5072,6 +5091,7 @@ function showMultiColorPanel(item, tileEl) {
     .then(txt => {
       const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
       const svg = doc.querySelector('svg');
+      const loadedSvgMarkup = svg ? svg.outerHTML : '';
       const parts = svg ? getNamedSvgParts(svg) : [];
 
       // DEBUG: log what parts were found
@@ -5115,6 +5135,7 @@ function showMultiColorPanel(item, tileEl) {
             </label>
           `).join('')}
         </div>
+        <div id="mc-preview" class="pc-sd__multicolor-preview"></div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Marker Colors</div>
         <div class="pc-sd__minihead" style="opacity:.8; margin-bottom:8px;">Standard Colors</div>
         <div class="pc-sd__multicolor-palette pc-sd__swatches" style="margin-bottom:12px;">
@@ -5146,10 +5167,49 @@ function showMultiColorPanel(item, tileEl) {
         });
       };
 
+      const updateMulticolorPreview = () => {
+        const preview = document.querySelector('#mc-preview svg');
+        if (!preview) return;
+        applyColorMapToSvg(preview, pendingMultiColorMap);
+      };
+
+      const highlightPreviewPart = (partName) => {
+        const preview = document.querySelector('#mc-preview svg');
+        if (!preview) return;
+
+        preview.querySelectorAll('[data-part]').forEach(el => {
+          el.classList.remove('mc-active-part');
+        });
+
+        const part = preview.querySelector(`[data-part="${partName}"]`);
+        if (part) {
+          part.classList.add('mc-active-part');
+        }
+      };
+
+      const preview = document.getElementById('mc-preview');
+      if (preview) {
+        preview.innerHTML = loadedSvgMarkup;
+        const previewSvg = preview.querySelector('svg');
+        if (previewSvg) {
+          parts.forEach(p => {
+            const escapedId = (typeof CSS !== 'undefined' && CSS.escape)
+              ? CSS.escape(p.id)
+              : String(p.id).replace(/([ #;?%&,.+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+            const previewPartEl = (typeof previewSvg.getElementById === 'function' ? previewSvg.getElementById(p.id) : null)
+              || previewSvg.querySelector(`#${escapedId}`);
+            if (previewPartEl) previewPartEl.setAttribute('data-part', p.id);
+          });
+        }
+        updateMulticolorPreview();
+        highlightPreviewPart(activeMultiColorPart);
+      }
+
       inner.querySelectorAll('input[name="pc-sd-multicolor-part"]').forEach(partOption => {
         partOption.addEventListener('change', () => {
           activeMultiColorPart = partOption.value;
           renderSwatchSelection();
+          highlightPreviewPart(activeMultiColorPart);
         });
       });
 
@@ -5161,6 +5221,7 @@ function showMultiColorPanel(item, tileEl) {
           const hex = swatch.dataset.hex;
           pendingMultiColorMap[activeMultiColorPart] = hex;
           renderSwatchSelection();
+          updateMulticolorPreview();
         });
       });
 
