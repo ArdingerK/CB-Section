@@ -3661,12 +3661,23 @@ font-weight: bold;
   justify-content:center;
   background:#f1f6f6;
   border-radius:8px;
+  padding:16px;
 }
 
 .pc-sd__multicolor-preview svg{
-  max-width:100%;
-  max-height:100%;
+  max-width:85%;
+  max-height:85%;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.15));
+}
+
+#mc-preview svg [data-part]{
+  opacity:.35;
+}
+
+#mc-preview svg [data-part]:hover{
+  filter:
+    drop-shadow(0 0 4px #ffffff)
+    drop-shadow(0 0 6px #f2b233);
 }
 
 .pc-sd__multicolor-part-label {
@@ -3693,13 +3704,22 @@ font-weight: bold;
   transition: transform 0.1s ease, border-color 0.1s ease;
 }
 
+.pc-sd__color-swatch{
+  background:#3a3a3a;
+  border-radius:50%;
+}
+
 .pc-sd__color-active{
   box-shadow:0 0 0 3px rgba(0,0,0,0.25);
 }
 
 .mc-active-part{
-  filter: drop-shadow(0 0 4px rgba(255,180,0,0.9));
+  filter:
+    drop-shadow(0 0 4px #ffffff)
+    drop-shadow(0 0 6px #f2b233);
+  stroke:#f2b233;
   stroke-width:2;
+  opacity:1;
 }
 
 </style>
@@ -5191,7 +5211,7 @@ function showMultiColorPanel(item, tileEl) {
         <div class="pc-sd__multicolor-palette pc-sd__swatches" style="margin-bottom:12px;">
           ${STANDARD_MARKER_COLORS.map(c => `
             <div
-              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
+              class="pc-sd__swatch pc-sd__color-swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
               data-hex="${c.hex}"
               title="${c.name}"
               style="background:${c.hex};"
@@ -5202,7 +5222,7 @@ function showMultiColorPanel(item, tileEl) {
         <div class="pc-sd__multicolor-palette pc-sd__swatches">
           ${TWELVE_PACK_MARKER_COLORS.map(c => `
             <div
-              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
+              class="pc-sd__swatch pc-sd__color-swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
               data-hex="${c.hex}"
               title="${c.name}"
               style="background:${c.hex};"
@@ -5237,10 +5257,10 @@ function showMultiColorPanel(item, tileEl) {
         }
       };
 
-      const preview = document.getElementById('mc-preview');
-      if (preview) {
-        preview.innerHTML = loadedSvgMarkup;
-        const previewSvg = preview.querySelector('svg');
+      const previewContainer = document.getElementById('mc-preview');
+      if (previewContainer) {
+        previewContainer.innerHTML = loadedSvgMarkup;
+        const previewSvg = previewContainer.querySelector('svg');
         if (previewSvg) {
           parts.forEach(p => {
             const escapedId = (typeof CSS !== 'undefined' && CSS.escape)
@@ -5249,6 +5269,13 @@ function showMultiColorPanel(item, tileEl) {
             const previewPartEl = (typeof previewSvg.getElementById === 'function' ? previewSvg.getElementById(p.id) : null)
               || previewSvg.querySelector(`#${escapedId}`);
             if (previewPartEl) previewPartEl.setAttribute('data-part', p.id);
+          });
+        }
+        const preview = document.querySelector('#mc-preview');
+        if(preview){
+          preview.querySelectorAll('[data-part]').forEach(el=>{
+            el.addEventListener('mouseenter',()=>el.classList.add('mc-active-part'));
+            el.addEventListener('mouseleave',()=>el.classList.remove('mc-active-part'));
           });
         }
         updateMulticolorPreview();
