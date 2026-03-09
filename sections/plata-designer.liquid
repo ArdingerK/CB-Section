@@ -3715,8 +3715,6 @@ font-weight: bold;
 .mc-active-part{
   stroke:#f2b233;
   stroke-width:2;
-  filter:none;
-  opacity:1;
 }
 
 </style>
@@ -4254,16 +4252,10 @@ let pendingPlacePackKey = '';
 
 function getNamedSvgParts(svg) {
   if (!svg) return [];
-  const candidates = Array.from(svg.querySelectorAll('g[id], path[id], rect[id], circle[id], ellipse[id], polygon[id], polyline[id]'));
-  const named = candidates.filter(el => {
-    const id = el.id || '';
-    if (/^(Layer_?\d*|layer_?\d*|g\d+|svg\d+|Easter_Egg)$/i.test(id)) return false;
-    return true;
-  });
-
-  // Some vendor SVGs only use generic ids like Layer_1 / Layer_2.
-  // In that case, keep the original candidates so the multi-color panel can still render.
-  return named.length ? named : candidates;
+  const parts = Array.from(svg.querySelectorAll('[id]'))
+    .map(el => el.id)
+    .filter(id => id && id !== svg.id);
+  return parts;
 }
 
 function applyColorMapToSvg(svg, colorMap) {
@@ -5165,7 +5157,7 @@ function showMultiColorPanel(item, tileEl) {
       // DEBUG: log what parts were found
       console.log('[MultiColor] SVG found?', !!svg);
       console.log('[MultiColor] All g[id] elements:', svg ? Array.from(svg.querySelectorAll('g[id]')).map(g => g.id) : 'no svg');
-      console.log('[MultiColor] Named parts found:', parts.map(p => p.id));
+      console.log('[MultiColor] Named parts found:', parts);
 
       if (parts.length === 0) {
         panel.style.display = 'none';
@@ -5177,30 +5169,40 @@ function showMultiColorPanel(item, tileEl) {
         return;
       }
 
-      parts.forEach(g => {
-        if (!pendingMultiColorMap[g.id]) pendingMultiColorMap[g.id] = '#f5f5f5';
+      parts.forEach(part => {
+        if (!pendingMultiColorMap[part]) pendingMultiColorMap[part] = '#f5f5f5';
       });
 
-      if (!parts.some(p => p.id === activeMultiColorPart)) {
-        activeMultiColorPart = parts[0]?.id || '';
+      if (!parts.some(part => part === activeMultiColorPart)) {
+        activeMultiColorPart = parts[0] || '';
       }
+
+      const partOptions = [];
+      const addPartOption = (part, label) => {
+        partOptions.push(`
+          <label class="pc-sd__multicolor-part-option">
+            <input
+              type="radio"
+              name="pc-sd-multicolor-part"
+              value="${part}"
+              ${activeMultiColorPart === part ? 'checked' : ''}
+            />
+            <span>${label}</span>
+          </label>
+        `);
+      };
+
+      parts.forEach(part => {
+        const label = part.replace(/[-_]/g, ' ');
+        addPartOption(part, label);
+      });
 
       inner.innerHTML = `
         <div class="pc-sd__multicolor-title">Multi-Color Stencil</div>
         <div class="pc-sd__multicolor-subtitle">Select a stencil part, then choose a marker color to apply.</div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Select a part:</div>
         <div class="pc-sd__multicolor-part-list">
-          ${parts.map(g => `
-            <label class="pc-sd__multicolor-part-option">
-              <input
-                type="radio"
-                name="pc-sd-multicolor-part"
-                value="${g.id}"
-                ${activeMultiColorPart === g.id ? 'checked' : ''}
-              />
-              <span>${g.id.replace(/[-_]/g, ' ')}</span>
-            </label>
-          `).join('')}
+          ${partOptions.join('')}
         </div>
         <div id="mc-preview" class="pc-sd__multicolor-preview"></div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Marker Colors</div>
@@ -5241,16 +5243,18 @@ function showMultiColorPanel(item, tileEl) {
       };
 
       const highlightPreviewPart = (partName) => {
+        const selectedPart = partName;
         const preview = document.querySelector('#mc-preview svg');
-        if (!preview) return;
 
-        preview.querySelectorAll('[data-part]').forEach(el => {
-          el.classList.remove('mc-active-part');
-        });
+        if(preview){
+          preview.querySelectorAll('[data-part]').forEach(el=>{
+            el.classList.remove('mc-active-part');
+          });
 
-        const part = preview.querySelector(`[data-part="${partName}"]`);
-        if (part) {
-          part.classList.add('mc-active-part');
+          const active = preview.querySelector('[data-part="'+selectedPart+'"]');
+          if(active){
+            active.classList.add('mc-active-part');
+          }
         }
       };
 
@@ -5259,13 +5263,13 @@ function showMultiColorPanel(item, tileEl) {
         preview.innerHTML = loadedSvgMarkup;
         const previewSvg = preview.querySelector('svg');
         if (previewSvg) {
-          parts.forEach(p => {
+          parts.forEach(part => {
             const escapedId = (typeof CSS !== 'undefined' && CSS.escape)
-              ? CSS.escape(p.id)
-              : String(p.id).replace(/([ #;?%&,.+*~':"!^$\[\]()=>|/@])/g, '\\$1');
-            const previewPartEl = (typeof previewSvg.getElementById === 'function' ? previewSvg.getElementById(p.id) : null)
+              ? CSS.escape(part)
+              : String(part).replace(/([ #;?%&,.+*~':"!^$\[\]()=>|/@])/g, '\\$1');
+            const previewPartEl = (typeof previewSvg.getElementById === 'function' ? previewSvg.getElementById(part) : null)
               || previewSvg.querySelector(`#${escapedId}`);
-            if (previewPartEl) previewPartEl.setAttribute('data-part', p.id);
+            if (previewPartEl) previewPartEl.setAttribute('data-part', part);
           });
         }
         updateMulticolorPreview();
