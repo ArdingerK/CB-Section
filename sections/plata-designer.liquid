@@ -3694,7 +3694,8 @@ font-weight: bold;
 
 #mc-preview [data-part].mc-active{
   stroke:#FFC42E;
-  stroke-width:2px;
+  stroke-width:2;
+  paint-order:stroke fill;
 }
 
 .pc-sd__multicolor-part-label {
@@ -5164,7 +5165,7 @@ function showMultiColorPanel(item, tileEl) {
 
       // DEBUG: log what parts were found
       console.log('[MultiColor] SVG found?', !!svg);
-      console.log('[MultiColor] All g[id] elements:', svg ? Array.from(svg.querySelectorAll('g[id]')).map(g => g.id) : 'no svg');
+      console.log('[MultiColor] All [id] elements:', svg ? Array.from(svg.querySelectorAll('[id]')).map(g => g.id) : 'no svg');
       console.log('[MultiColor] Named parts found:', parts);
 
       if (parts.length === 0) {
