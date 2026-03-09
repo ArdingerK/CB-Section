@@ -4396,9 +4396,13 @@ document.addEventListener('click',(e)=>{
   const hex = swatch.dataset.hex;
 
   const svg = document.querySelector('#mc-preview svg');
-  const el = svg?.querySelector(`[data-part="${part}"]`);
-
-  if(el) el.style.fill = hex;
+  if(svg){
+    svg
+      .querySelectorAll(`[data-part="${part}"], [data-part="${part}"] *`)
+      .forEach(el => {
+        el.style.fill = hex;
+      });
+  }
 
   pendingMultiColorMap[part] = hex;
   activeMultiColorPart = part;
