@@ -828,22 +828,6 @@
   }
   .pc-sd__placed svg{ width:100%; height:100%; display:block; }
   .pc-sd__placed svg *{ fill:var(--stencil-color,#fff) !important; transition:fill .2s; }
-  /* ===== Multicolor preview override ===== */
-  .pc-sd__multicolor-preview svg *{
-    fill: initial !important;
-    stroke: initial !important;
-  }
-
-  .pc-sd__multicolor-preview svg [data-part]{
-    opacity:1 !important;
-  }
-
-  /* highlight selected preview part */
-  .pc-sd__multicolor-preview svg [data-part].mc-active{
-    stroke:#FFC42E !important;
-    stroke-width:3 !important;
-    paint-order:stroke fill;
-  }
   .pc-sd__placed img{ width:100%; height:100%; object-fit:contain; }
   .pc-sd__placed.selected{
     outline:3px solid rgba(246,170,37,.95);
@@ -4404,6 +4388,9 @@ function highlightPreviewPart(part){
   if(!active) return;
 
   active.classList.add("mc-active");
+
+  active.style.paintOrder = "stroke fill";
+  active.style.strokeLinejoin = "round";
 
 }
 
