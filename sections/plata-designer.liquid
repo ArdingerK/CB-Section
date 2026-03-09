@@ -4329,6 +4329,105 @@ let pendingMultiColorMap = {};
 let pendingMultiColorPlacedEl = null;
 let activeMultiColorPart = '';
 
+function initMulticolorPreview(svgMarkup){
+
+  const preview = document.getElementById('mc-preview');
+  if(!preview) return;
+
+  preview.innerHTML = svgMarkup;
+
+  const svg = preview.querySelector('svg');
+  if(!svg) return;
+
+  const parts = Array.from(svg.querySelectorAll('[id]'))
+    .map(el => el.id)
+    .filter(id => id !== svg.id);
+
+  console.log('[MultiColor] detected parts:', parts);
+
+  parts.forEach(id=>{
+    const el = svg.getElementById(id);
+    if(el) el.dataset.part = id;
+  });
+
+  buildPartSelector(parts);
+}
+
+function buildPartSelector(parts){
+
+  const container = document.querySelector('.pc-sd__multicolor-part-list');
+  if(!container) return;
+
+  container.innerHTML = '';
+
+  parts.forEach((part,i)=>{
+
+    const label = part.replace(/[-_]/g,' ');
+
+    const row = document.createElement('label');
+    row.className = 'pc-sd__multicolor-part-option';
+    row.innerHTML = `
+      <input type="radio" name="mc-part" value="${part}" ${i===0?'checked':''}>
+      ${label}
+    `;
+
+    container.appendChild(row);
+
+  });
+
+}
+
+document.addEventListener('change',(e)=>{
+
+  if(e.target.name !== 'mc-part') return;
+
+  activeMultiColorPart = e.target.value;
+
+  const svg = document.querySelector('#mc-preview svg');
+  if(!svg) return;
+
+  svg.querySelectorAll('[data-part]').forEach(el=>{
+    el.classList.remove('mc-active');
+  });
+
+  const active = svg.querySelector(`[data-part="${activeMultiColorPart}"]`);
+  if(active) active.classList.add('mc-active');
+
+  const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
+  if(inner){
+    inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(swatch=>{
+      swatch.classList.toggle('pc-sd__color-active', pendingMultiColorMap[activeMultiColorPart] === swatch.dataset.hex);
+    });
+  }
+
+});
+
+document.addEventListener('click',(e)=>{
+  const swatch = e.target.closest('.pc-sd__multicolor-swatch');
+  if(!swatch) return;
+
+  const part = document.querySelector('input[name="mc-part"]:checked')?.value;
+  if(!part) return;
+
+  const hex = swatch.dataset.hex;
+
+  const svg = document.querySelector('#mc-preview svg');
+  const el = svg?.querySelector(`[data-part="${part}"]`);
+
+  if(el) el.style.fill = hex;
+
+  pendingMultiColorMap[part] = hex;
+  activeMultiColorPart = part;
+
+  const inner = root.querySelector('.pc-sd__multicolor-panel-inner');
+  if(inner){
+    inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(node=>{
+      node.classList.toggle('pc-sd__color-active', node === swatch);
+    });
+  }
+
+});
+
 function clearSelection() {
   selectedEls.forEach(s => s.classList.remove('selected'));
   selectedEls.clear();
@@ -5193,40 +5292,18 @@ function showMultiColorPanel(item, tileEl) {
         activeMultiColorPart = parts[0] || '';
       }
 
-      const partOptions = [];
-      const addPartOption = (part, label) => {
-        partOptions.push(`
-          <label class="pc-sd__multicolor-part-option">
-            <input
-              type="radio"
-              name="pc-sd-multicolor-part"
-              value="${part}"
-              ${activeMultiColorPart === part ? 'checked' : ''}
-            />
-            <span>${label}</span>
-          </label>
-        `);
-      };
-
-      parts.forEach(part => {
-        const label = part.replace(/[-_]/g, ' ');
-        addPartOption(part, label);
-      });
-
       inner.innerHTML = `
         <div class="pc-sd__multicolor-title">Multi-Color Stencil</div>
         <div class="pc-sd__multicolor-subtitle">Select a stencil part, then choose a marker color to apply.</div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Select a part:</div>
-        <div class="pc-sd__multicolor-part-list">
-          ${partOptions.join('')}
-        </div>
+        <div class="pc-sd__multicolor-part-list"></div>
         <div id="mc-preview" class="pc-sd__multicolor-preview"></div>
         <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1f2937;">Marker Colors</div>
         <div class="pc-sd__minihead" style="opacity:.8; margin-bottom:8px;">Standard Colors</div>
         <div class="pc-sd__multicolor-palette pc-sd__swatches" style="margin-bottom:12px;">
           ${STANDARD_MARKER_COLORS.map(c => `
             <div
-              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
+              class="pc-sd__swatch pc-sd__multicolor-swatch"
               data-hex="${c.hex}"
               title="${c.name}"
               style="background:${c.hex};"
@@ -5237,7 +5314,7 @@ function showMultiColorPanel(item, tileEl) {
         <div class="pc-sd__multicolor-palette pc-sd__swatches">
           ${TWELVE_PACK_MARKER_COLORS.map(c => `
             <div
-              class="pc-sd__swatch pc-sd__multicolor-swatch${pendingMultiColorMap[activeMultiColorPart] === c.hex ? ' pc-sd__color-active' : ''}"
+              class="pc-sd__swatch pc-sd__multicolor-swatch"
               data-hex="${c.hex}"
               title="${c.name}"
               style="background:${c.hex};"
@@ -5247,71 +5324,23 @@ function showMultiColorPanel(item, tileEl) {
       `;
 
       const renderSwatchSelection = () => {
-        inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(s => {
-          s.classList.toggle('pc-sd__color-active', pendingMultiColorMap[activeMultiColorPart] === s.dataset.hex);
+        const selectedPart = document.querySelector('input[name="mc-part"]:checked')?.value || activeMultiColorPart;
+        inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(swatch => {
+          swatch.classList.toggle('pc-sd__color-active', pendingMultiColorMap[selectedPart] === swatch.dataset.hex);
         });
       };
 
-      const updateMulticolorPreview = () => {
-        const preview = document.querySelector('#mc-preview svg');
-        if (!preview) return;
-        applyColorMapToSvg(preview, pendingMultiColorMap);
-      };
+      initMulticolorPreview(loadedSvgMarkup);
+      activeMultiColorPart = document.querySelector('input[name="mc-part"]:checked')?.value || parts[0] || '';
 
-      function highlightPreviewPart(part){
-        const preview = document.getElementById('mc-preview');
-        if(!preview) return;
-
-        const svg = preview.querySelector('svg');
-        if(!svg) return;
-
-        svg.querySelectorAll('[data-part]').forEach(el=>{
-          el.classList.remove('mc-active');
-        });
-
-        const active = svg.querySelector('[data-part="'+part+'"]');
-        if(active){
-          active.classList.add('mc-active');
-        }
+      const previewSvg = document.querySelector('#mc-preview svg');
+      if (previewSvg) {
+        applyColorMapToSvg(previewSvg, pendingMultiColorMap);
+        const active = previewSvg.querySelector(`[data-part="${activeMultiColorPart}"]`);
+        if (active) active.classList.add('mc-active');
       }
 
-      const preview = document.getElementById('mc-preview');
-      if (preview) {
-        preview.innerHTML = loadedSvgMarkup;
-        const previewSvg = preview.querySelector('svg');
-        if (previewSvg) {
-          previewSvg.querySelectorAll('[id]').forEach(el => {
-            el.setAttribute('data-part', el.id);
-          });
-        }
-        updateMulticolorPreview();
-        highlightPreviewPart(activeMultiColorPart);
-      }
-
-      inner.querySelectorAll('input[name="pc-sd-multicolor-part"]').forEach(partOption => {
-        partOption.addEventListener('change', () => {
-          activeMultiColorPart = partOption.value;
-          renderSwatchSelection();
-          highlightPreviewPart(activeMultiColorPart);
-        });
-      });
-
-      inner.querySelectorAll('.pc-sd__multicolor-swatch').forEach(swatch => {
-        swatch.addEventListener('pointerdown', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!activeMultiColorPart) return;
-          inner.querySelectorAll('.pc-sd__color-active').forEach(el => {
-            el.classList.remove('pc-sd__color-active');
-          });
-          swatch.classList.add('pc-sd__color-active');
-          const hex = swatch.dataset.hex;
-          pendingMultiColorMap[activeMultiColorPart] = hex;
-          renderSwatchSelection();
-          updateMulticolorPreview();
-        });
-      });
-
+      renderSwatchSelection();
       panel.style.display = 'block';
       setSelectedPaletteTile(isPlacedStencil ? null : tileEl);
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
