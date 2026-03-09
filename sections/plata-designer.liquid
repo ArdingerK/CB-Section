@@ -3675,13 +3675,26 @@ font-weight: bold;
 }
 
 #mc-preview{
-  padding:12px;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,.15);
+  background:#3a3a3a;
+  border-radius:10px;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#mc-preview svg{
+  max-width:80%;
+  max-height:80%;
 }
 
 #mc-preview svg [data-part]{
   opacity:1;
+}
+
+#mc-preview [data-part].mc-active{
+  stroke:#FFC42E;
+  stroke-width:2px;
 }
 
 .pc-sd__multicolor-part-label {
@@ -3710,11 +3723,6 @@ font-weight: bold;
 
 .pc-sd__color-active{
   box-shadow:0 0 0 3px rgba(0,0,0,0.25);
-}
-
-.mc-active-part{
-  stroke:#f2b233;
-  stroke-width:2;
 }
 
 </style>
@@ -5242,21 +5250,22 @@ function showMultiColorPanel(item, tileEl) {
         applyColorMapToSvg(preview, pendingMultiColorMap);
       };
 
-      const highlightPreviewPart = (partName) => {
-        const selectedPart = partName;
-        const preview = document.querySelector('#mc-preview svg');
+      function highlightPreviewPart(part){
+        const preview = document.getElementById('mc-preview');
+        if(!preview) return;
 
-        if(preview){
-          preview.querySelectorAll('[data-part]').forEach(el=>{
-            el.classList.remove('mc-active-part');
-          });
+        const svg = preview.querySelector('svg');
+        if(!svg) return;
 
-          const active = preview.querySelector('[data-part="'+selectedPart+'"]');
-          if(active){
-            active.classList.add('mc-active-part');
-          }
+        svg.querySelectorAll('[data-part]').forEach(el=>{
+          el.classList.remove('mc-active');
+        });
+
+        const active = svg.querySelector('[data-part="'+part+'"]');
+        if(active){
+          active.classList.add('mc-active');
         }
-      };
+      }
 
       const preview = document.getElementById('mc-preview');
       if (preview) {
