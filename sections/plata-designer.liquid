@@ -5161,11 +5161,18 @@ function showMultiColorPanel(item, tileEl) {
       const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
       const svg = doc.querySelector('svg');
       const loadedSvgMarkup = svg ? svg.outerHTML : '';
-      const parts = svg ? getNamedSvgParts(svg) : [];
+      const previewContainer = document.createElement('div');
+      previewContainer.innerHTML = loadedSvgMarkup;
+      const previewSvgForParts = previewContainer.querySelector('svg');
+      const parts = previewSvgForParts
+        ? Array.from(previewSvgForParts.querySelectorAll('[id]'))
+            .map(el => el.id)
+            .filter(id => id !== previewSvgForParts.id)
+        : [];
 
       // DEBUG: log what parts were found
       console.log('[MultiColor] SVG found?', !!svg);
-      console.log('[MultiColor] All [id] elements:', svg ? Array.from(svg.querySelectorAll('[id]')).map(g => g.id) : 'no svg');
+      console.log('[MultiColor] All [id] elements:', previewSvgForParts ? Array.from(previewSvgForParts.querySelectorAll('[id]')).map(g => g.id) : 'no svg');
       console.log('[MultiColor] Named parts found:', parts);
 
       if (parts.length === 0) {
@@ -5273,13 +5280,8 @@ function showMultiColorPanel(item, tileEl) {
         preview.innerHTML = loadedSvgMarkup;
         const previewSvg = preview.querySelector('svg');
         if (previewSvg) {
-          parts.forEach(part => {
-            const escapedId = (typeof CSS !== 'undefined' && CSS.escape)
-              ? CSS.escape(part)
-              : String(part).replace(/([ #;?%&,.+*~':"!^$\[\]()=>|/@])/g, '\\$1');
-            const previewPartEl = (typeof previewSvg.getElementById === 'function' ? previewSvg.getElementById(part) : null)
-              || previewSvg.querySelector(`#${escapedId}`);
-            if (previewPartEl) previewPartEl.setAttribute('data-part', part);
+          previewSvg.querySelectorAll('[id]').forEach(el => {
+            el.setAttribute('data-part', el.id);
           });
         }
         updateMulticolorPreview();
