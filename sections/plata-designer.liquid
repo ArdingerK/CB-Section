@@ -4489,8 +4489,7 @@ if (!stage || typeof stage.addEventListener !== 'function') {
 
     const placed = e.target?.closest?.('.pc-sd__placed');
     if (placed && stage.contains(placed)) {
-      console.log('[DEBUG] stage pointerdown placed stencil');
-      selectPlacedStencilFromEvent(placed, e);
+      console.log('[DEBUG] stage pointerdown placed stencil (handled by placed stencil listener)');
       return;
     }
 
@@ -5624,8 +5623,9 @@ if (hint) {
 
     if (!dragged) {
       console.log('[PlacedStencil] tap detected');
-      syncMultiColorPanelToSelection(el.__stencilItem);
-      if (isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
+      const selectedStencil = selectedEls.size === 1 ? Array.from(selectedEls)[0]?.__stencilItem : null;
+      syncMultiColorPanelToSelection(selectedStencil);
+      if (!e.shiftKey && selectedEls.size === 1 && selectedEls.has(el) && isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
         reopenMultiColorPanelForPlaced(el);
       }
       return;
