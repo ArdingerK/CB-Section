@@ -4435,9 +4435,11 @@ function syncMultiColorPanelToSelection(stencil){
   }
 }
 
-function selectPlacedStencilFromEvent(placedEl, event) {
+function selectPlacedStencilFromEvent(placedEl, event, options = {}) {
   console.log('[DEBUG] selectPlacedStencilFromEvent');
   if (!placedEl) return;
+
+  const preserveExistingSelection = !!options.preserveExistingSelection;
 
   if (event?.shiftKey) {
     if (selectedEls.has(placedEl)) {
@@ -4447,7 +4449,7 @@ function selectPlacedStencilFromEvent(placedEl, event) {
       placedEl.classList.add('selected');
       selectedEls.add(placedEl);
     }
-  } else {
+  } else if (!preserveExistingSelection) {
     clearSelection();
     placedEl.classList.add('selected');
     selectedEls.add(placedEl);
@@ -4456,7 +4458,7 @@ function selectPlacedStencilFromEvent(placedEl, event) {
   const selectedStencil = selectedEls.size === 1 ? Array.from(selectedEls)[0]?.__stencilItem : null;
   syncMultiColorPanelToSelection(selectedStencil);
 
-  if (!event?.shiftKey && selectedEls.size === 1 && selectedEls.has(placedEl) && isTruthyMulticolor(placedEl?.__stencilItem?.multicolor)) {
+  if (!event?.shiftKey && !preserveExistingSelection && selectedEls.size === 1 && selectedEls.has(placedEl) && isTruthyMulticolor(placedEl?.__stencilItem?.multicolor)) {
     reopenMultiColorPanelForPlaced(placedEl);
   }
 }
@@ -5569,8 +5571,9 @@ if (hint) {
   const startX = e.clientX;
   const startY = e.clientY;
   let dragged = false;
+  const preserveExistingSelection = !e.shiftKey && selectedEls.has(el) && selectedEls.size > 1;
 
-  selectPlacedStencilFromEvent(el, e);
+  selectPlacedStencilFromEvent(el, e, { preserveExistingSelection });
 
   if (selectedEls.size === 0) return;
 
@@ -5623,6 +5626,11 @@ if (hint) {
 
     if (!dragged) {
       console.log('[PlacedStencil] tap detected');
+      if (preserveExistingSelection) {
+        clearSelection();
+        el.classList.add('selected');
+        selectedEls.add(el);
+      }
       const selectedStencil = selectedEls.size === 1 ? Array.from(selectedEls)[0]?.__stencilItem : null;
       syncMultiColorPanelToSelection(selectedStencil);
       if (!e.shiftKey && selectedEls.size === 1 && selectedEls.has(el) && isTruthyMulticolor(el?.__stencilItem?.multicolor)) {
