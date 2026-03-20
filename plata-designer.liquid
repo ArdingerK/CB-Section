@@ -1,0 +1,11 @@
+/* Updated CSS to allow board image to overflow without clipping */
+.pc-sd__board {
+    overflow: visible; /* Allow overflow for the board image */
+}
+
+/* Additional JavaScript for Bug 2 */
+document.querySelectorAll('input[name="pc_sd_frame"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        updateBoard(); // Update the board on frame variant change
+    });
+});
